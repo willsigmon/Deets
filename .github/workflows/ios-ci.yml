@@ -1,0 +1,321 @@
+name: iOS CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'Deets/**'
+      - 'DeetsTests/**'
+      - 'Config/**'
+      - 'Examples/**'
+      - 'Package.swift'
+      - 'project.yml'
+      - '.github/workflows/ios-ci.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'Deets/**'
+      - 'DeetsTests/**'
+      - 'Config/**'
+      - 'Examples/**'
+      - 'Package.swift'
+      - 'project.yml'
+
+  workflow_dispatch:
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
+  FASTLANE_SKIP_UPDATE_CHECK: true
+  FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
+  FASTLANE_XCODE_LIST_TIMEOUT: 120
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # CODE QUALITY CHECKS
+  # ============================================================================
+  swiftlint:
+    name: SwiftLint
+    runs-on: macos-14
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache SwiftLint
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/swiftlint
+          key: ${{ runner.os }}-swiftlint-0.55.0
+
+      - name: Install SwiftLint
+        run: |
+          if ! command -v swiftlint &> /dev/null; then
+            brew install swiftlint
+          fi
+
+      - name: Run SwiftLint
+        run: swiftlint lint --strict --reporter github-actions-logging
+
+      - name: SwiftLint Report
+        if: always()
+        run: |
+          swiftlint lint --reporter html > swiftlint-report.html || true
+
+      - name: Upload SwiftLint Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: swiftlint-report
+          path: swiftlint-report.html
+          retention-days: 30
+
+  # ============================================================================
+  # BUILD & TEST
+  # ============================================================================
+  build-and-test:
+    name: Build & Test (Xcode ${{ matrix.xcode }})
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode: ['15.2']
+        include:
+          - xcode: '15.2'
+            ios: '17.2'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
+
+      - name: Show Xcode and Swift versions
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            DerivedData/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: DerivedData
+          key: ${{ runner.os }}-deriveddata-${{ hashFiles('**/*.swift', 'Package.swift') }}
+          restore-keys: |
+            ${{ runner.os }}-deriveddata-
+
+      - name: Install XcodeGen
+        run: |
+          if ! command -v xcodegen &> /dev/null; then
+            brew install xcodegen
+          fi
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Resolve SPM dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Deets.xcodeproj \
+            -scheme Deets
+
+      - name: Build for testing
+        run: |
+          xcodebuild build-for-testing \
+            -project Deets.xcodeproj \
+            -scheme Deets \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=${{ matrix.ios }}' \
+            -derivedDataPath DerivedData \
+            -resultBundlePath TestResults-build.xcresult \
+            -enableCodeCoverage YES \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            | xcpretty && exit ${PIPESTATUS[0]}
+
+      - name: Run tests
+        run: |
+          xcodebuild test-without-building \
+            -project Deets.xcodeproj \
+            -scheme Deets \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=${{ matrix.ios }}' \
+            -derivedDataPath DerivedData \
+            -resultBundlePath TestResults-test.xcresult \
+            -enableCodeCoverage YES \
+            | xcpretty && exit ${PIPESTATUS[0]}
+
+      - name: Generate code coverage report
+        if: success()
+        run: |
+          xcrun xccov view --report --json DerivedData/Logs/Test/*.xcresult > coverage.json
+          xcrun xccov view --report DerivedData/Logs/Test/*.xcresult > coverage.txt
+
+      - name: Display code coverage
+        if: success()
+        run: cat coverage.txt
+
+      - name: Check code coverage threshold
+        if: success()
+        run: |
+          COVERAGE=$(cat coverage.txt | grep "Total" | awk '{print $3}' | sed 's/%//')
+          THRESHOLD=70
+          echo "Code coverage: ${COVERAGE}%"
+          echo "Threshold: ${THRESHOLD}%"
+
+          if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+            echo "❌ Code coverage ${COVERAGE}% is below threshold ${THRESHOLD}%"
+            exit 1
+          else
+            echo "✅ Code coverage ${COVERAGE}% meets threshold ${THRESHOLD}%"
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.xcode }}
+          path: |
+            TestResults-*.xcresult
+            coverage.json
+            coverage.txt
+          retention-days: 30
+
+      - name: Upload code coverage to Codecov
+        if: success()
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.json
+          flags: unittests
+          name: ios-coverage
+          fail_ci_if_error: false
+
+  # ============================================================================
+  # INTEGRATION TESTS
+  # ============================================================================
+  integration-tests:
+    name: Integration Tests
+    runs-on: macos-14
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            DerivedData/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Run integration tests
+        run: |
+          xcodebuild test \
+            -project Deets.xcodeproj \
+            -scheme Deets \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+            -testPlan DeetsIntegrationTests \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            | xcpretty && exit ${PIPESTATUS[0]}
+
+  # ============================================================================
+  # BUILD VALIDATION
+  # ============================================================================
+  validate-build:
+    name: Validate Release Build
+    runs-on: macos-14
+    needs: swiftlint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            DerivedData/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build for release (validation)
+        run: |
+          xcodebuild build \
+            -project Deets.xcodeproj \
+            -scheme Deets \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath DerivedData \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            | xcpretty && exit ${PIPESTATUS[0]}
+
+  # ============================================================================
+  # REPORTING
+  # ============================================================================
+  report:
+    name: CI Summary Report
+    runs-on: macos-14
+    needs: [swiftlint, build-and-test, validate-build]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Generate CI summary
+        run: |
+          echo "# iOS CI Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "- SwiftLint: ${{ needs.swiftlint.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build & Test: ${{ needs.build-and-test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Validate Build: ${{ needs.validate-build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- Test results and coverage reports available for download" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check overall status
+        if: |
+          needs.swiftlint.result != 'success' ||
+          needs.build-and-test.result != 'success' ||
+          needs.validate-build.result != 'success'
+        run: |
+          echo "❌ CI failed. Please check the logs above."
+          exit 1

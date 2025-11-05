@@ -1,0 +1,98 @@
+# Fastlane Scanfile - Testing Configuration
+# Documentation: https://docs.fastlane.tools/actions/scan/
+
+# Scheme to test
+scheme("Deets")
+
+# Test plan to execute (optional)
+# testplan("Deets")
+
+# Devices to test on
+devices([
+  "iPhone 15 Pro",
+  "iPhone 15",
+  "iPhone 14 Pro"
+])
+
+# Clean before building
+clean(true)
+
+# Build configuration (Debug, Release)
+configuration("Debug")
+
+# Code coverage
+code_coverage(true)
+
+# Derived data path
+derived_data_path("./DerivedData")
+
+# Result bundle (for detailed test results)
+result_bundle(true)
+
+# Output directory for test results
+output_directory("./fastlane/test_output")
+
+# Output types (html, junit, json-compilation-database)
+output_types("html,junit")
+
+# Fail build if tests fail
+fail_build(true)
+
+# Open test report after testing
+open_report(false)
+
+# Disable slide to type on iOS simulator keyboard
+disable_slide_to_type(true)
+
+# Reset simulator before each test
+reset_simulator(false)
+
+# Reinstall app before testing
+reinstall_app(false)
+
+# Maximum concurrent simulators
+max_concurrent_simulators(4)
+
+# Skip building for testing
+skip_build(false)
+
+# Build for testing only (no tests run)
+build_for_testing(false)
+
+# Test without building
+test_without_building(false)
+
+# Only test specific test targets
+# only_testing([
+#   "DeetsTests",
+#   "DeetsUITests"
+# ])
+
+# Skip specific test targets
+# skip_testing([
+#   "DeetsTests/PerformanceTests"
+# ])
+
+# Prelaunch simulator
+prelaunch_simulator(true)
+
+# Number of retries for failed tests
+number_of_retries(0)
+
+# xcargs (additional xcodebuild arguments)
+xcargs("-parallel-testing-enabled YES -maximum-parallel-testing-workers 4")
+
+# Skip package dependencies resolution
+skip_package_dependencies_resolution(false)
+
+# Disable XCPretty formatting
+disable_xcpretty(false)
+
+# XCPretty formatter
+formatter("xcpretty")
+
+# Output style for XCPretty
+output_style("basic")
+
+# Suppress Xcode output
+suppress_xcode_output(false)

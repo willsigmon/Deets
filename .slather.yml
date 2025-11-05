@@ -1,0 +1,66 @@
+# Slather Configuration for Code Coverage
+# Documentation: https://github.com/SlatherOrg/slather
+
+# Coverage service (codecov, coveralls, gutter_json, cobertura_xml, html, etc.)
+coverage_service: html
+cobertura_xml: true
+html: true
+
+# Xcode project
+xcodeproj: Deets.xcodeproj
+
+# Scheme to analyze
+scheme: Deets
+
+# Build directory
+build_directory: DerivedData
+
+# Output directory
+output_directory: fastlane/coverage
+
+# Source directory
+source_directory: Deets
+
+# Ignore patterns
+ignore:
+  - "DeetsTests/*"
+  - "DeetsUITests/*"
+  - "Pods/*"
+  - ".build/*"
+  - "DerivedData/*"
+  - "fastlane/*"
+  - "Examples/*"
+  - "Documentation/*"
+  - "Docs/*"
+  - "**/*.xib"
+  - "**/*.storyboard"
+
+# Minimum coverage threshold (percentage)
+# coverage_threshold: 70
+
+# Fail build if coverage is below threshold
+# fail_if_coverage_below: 70
+
+# Verbose output
+verbose: true
+
+# Show coverage in Xcode
+show_coverage: true
+
+# Decimal places for coverage percentages
+decimals: 2
+
+# Binary file
+binary_file: DerivedData/Build/Products/Debug-iphonesimulator/Deets.app/Deets
+
+# Binary basename
+binary_basename: Deets
+
+# Architecture (arm64, x86_64)
+arch: x86_64
+
+# Source files
+source_files: true
+
+# Workspace (if using workspace instead of project)
+# workspace: Deets.xcworkspace

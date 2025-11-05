@@ -1,0 +1,61 @@
+{
+  "configurations" : [
+    {
+      "id" : "8F0F5D97-5D9F-5C0F-9D9F-5D9F5C0F9D9F",
+      "name" : "Integration Tests",
+      "options" : {
+        "codeCoverage" : {
+          "targets" : [
+            {
+              "containerPath" : "container:Deets.xcodeproj",
+              "identifier" : "DeetsKit",
+              "name" : "DeetsKit"
+            }
+          ]
+        },
+        "commandLineArgumentEntries" : [
+          {
+            "argument" : "-INTEGRATION_TESTING",
+            "enabled" : true
+          }
+        ],
+        "environmentVariableEntries" : [
+          {
+            "key" : "IS_INTEGRATION_TESTING",
+            "value" : "1"
+          },
+          {
+            "key" : "CLOUDKIT_ENABLED",
+            "value" : "0"
+          }
+        ],
+        "language" : "en",
+        "region" : "US",
+        "targetForVariableExpansion" : {
+          "containerPath" : "container:Deets.xcodeproj",
+          "identifier" : "Deets",
+          "name" : "Deets"
+        }
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Deets.xcodeproj",
+      "identifier" : "Deets",
+      "name" : "Deets"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:Deets.xcodeproj",
+        "identifier" : "DeetsIntegrationTests",
+        "name" : "DeetsIntegrationTests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -1,0 +1,334 @@
+/*
+  Localizable.strings
+  Deets
+
+  UX Copy for Deets - Business Card Scanner
+  Brand Voice: Conversational, confident, human, emotionally intelligent
+  Tagline: "Meet once. Remember always."
+*/
+
+// MARK: - App Branding
+
+"app.name" = "Deets";
+"app.tagline" = "Meet once. Remember always.";
+"app.tagline.full" = "Meet once. Remember always. Never lose a connection.";
+
+// MARK: - Onboarding
+
+"onboarding.welcome.title" = "Welcome to Deets";
+"onboarding.welcome.message" = "The business card scanner that actually remembers for you.";
+
+"onboarding.feature1.title" = "Scan in Seconds";
+"onboarding.feature1.message" = "Point your camera at any business card. We'll capture the details instantly.";
+
+"onboarding.feature2.title" = "Edit with Ease";
+"onboarding.feature2.message" = "Review and tweak the info before saving. We're smart, but you're smarter.";
+
+"onboarding.feature3.title" = "Never Forget";
+"onboarding.feature3.message" = "Save to your contacts, search anytime, and keep every connection alive.";
+
+"onboarding.privacy.title" = "Your Privacy Matters";
+"onboarding.privacy.message" = "Everything stays on your device. No cloud. No tracking. No nonsense.";
+"onboarding.privacy.detail" = "Deets processes all business cards locally on your iPhone. We never upload your contacts, access your data remotely, or share anything with third parties. Your connections are yours.";
+
+"onboarding.permissions.title" = "Two Quick Permissions";
+"onboarding.permissions.camera" = "Camera: To scan business cards";
+"onboarding.permissions.contacts" = "Contacts: To save cards (optional)";
+
+"onboarding.button.getStarted" = "Get Started";
+"onboarding.button.skip" = "Skip Intro";
+"onboarding.button.next" = "Next";
+"onboarding.button.done" = "Done";
+
+// MARK: - Tab Bar
+
+"tab.scan" = "Scan";
+"tab.cards" = "Cards";
+"tab.settings" = "Settings";
+
+// MARK: - Scan View
+
+"scan.title" = "Scan";
+"scan.header.title" = "Scan Business Card";
+"scan.header.message" = "Point your camera at a business card to extract contact information automatically";
+
+"scan.button.start" = "Start Scanning";
+"scan.button.cancel" = "Cancel";
+"scan.button.retry" = "Retry";
+
+"scan.guidance.tap" = "Tap on text to capture";
+"scan.guidance.position" = "Position the business card in the viewfinder";
+"scan.guidance.hold" = "Hold steady for best results";
+"scan.guidance.lighting" = "Make sure the card is well lit";
+
+"scan.requirements" = "Requires iOS 16+ and camera access";
+
+"scan.unavailable.title" = "Camera Scanning Unavailable";
+"scan.unavailable.message" = "Camera scanning is not available on this device";
+"scan.unavailable.simulator" = "Camera scanning is not supported in Simulator. Please run on a physical device.";
+
+"scan.permission.denied.title" = "Camera Permission Required";
+"scan.permission.denied.message" = "Deets needs camera access to scan business cards. You can enable this in Settings.";
+"scan.permission.denied.button" = "Open Settings";
+
+// MARK: - Scan Errors
+
+"scan.error.title" = "Scan Error";
+"scan.error.generic" = "Something went wrong while scanning. Please try again.";
+"scan.error.noText" = "No text detected on the card. Make sure it's clearly visible and well lit.";
+"scan.error.poorQuality" = "The image quality is too low. Try better lighting or hold the camera steadier.";
+"scan.error.timeout" = "Scanning timed out. Please try again.";
+
+// MARK: - Contact Preview
+
+"preview.title" = "New Contact";
+"preview.header.title" = "Review Contact";
+"preview.header.message" = "Verify and edit the extracted information";
+
+"preview.field.fullName" = "Full Name";
+"preview.field.fullName.required" = "Full Name *";
+"preview.field.fullName.placeholder" = "John Doe";
+
+"preview.field.jobTitle" = "Job Title";
+"preview.field.jobTitle.placeholder" = "Product Manager";
+
+"preview.field.company" = "Company";
+"preview.field.company.placeholder" = "Acme Inc";
+
+"preview.field.email" = "Email";
+"preview.field.email.placeholder" = "name@company.com";
+
+"preview.field.phone" = "Phone";
+"preview.field.phone.placeholder" = "+1 (555) 123-4567";
+
+"preview.field.website" = "Website";
+"preview.field.website.placeholder" = "https://company.com";
+
+"preview.field.address" = "Address";
+"preview.field.address.placeholder" = "123 Main St, City, State 12345";
+
+"preview.field.notes" = "Notes";
+"preview.field.notes.placeholder" = "Add any additional notes about this contact...";
+
+"preview.validation.nameRequired" = "Name is required";
+"preview.validation.emailInvalid" = "Please enter a valid email address";
+"preview.validation.phoneInvalid" = "Please enter a valid phone number";
+"preview.validation.websiteInvalid" = "Please enter a valid URL";
+
+"preview.button.saveBoth" = "Save to Database & Contacts";
+"preview.button.saveDatabaseOnly" = "Save to Database Only";
+"preview.button.cancel" = "Cancel";
+
+"preview.success.title" = "Contact Saved";
+"preview.success.message" = "The business card has been saved successfully.";
+"preview.success.withContacts" = "%@ has been saved to your database and Contacts app.";
+"preview.success.databaseOnly" = "%@ has been saved to your database.";
+
+"preview.error.title" = "Error Saving Contact";
+"preview.error.generic" = "Could not save the contact. Please try again.";
+"preview.error.databaseFailed" = "Failed to save to database. Please check your storage and try again.";
+"preview.error.contactsFailed" = "Saved to database, but couldn't save to Contacts. Check your permissions.";
+"preview.error.contactsPermissionDenied" = "Contacts permission is required to save to your Contacts app.";
+"preview.error.duplicate" = "This contact already exists.";
+
+// MARK: - Card List
+
+"list.title" = "Cards";
+"list.search.placeholder" = "Search cards...";
+
+"list.empty.title" = "No Business Cards Yet";
+"list.empty.message" = "Scan your first business card to get started. It only takes a moment!";
+"list.empty.action" = "Scan First Card";
+
+"list.noResults.title" = "No Results Found";
+"list.noResults.message" = "Try adjusting your search or filters to find what you're looking for.";
+"list.noResults.action" = "Clear Filters";
+
+"list.sort.title" = "Sort";
+"list.sort.dateNewest" = "Newest First";
+"list.sort.dateOldest" = "Oldest First";
+"list.sort.nameAZ" = "Name (A-Z)";
+"list.sort.nameZA" = "Name (Z-A)";
+"list.sort.companyAZ" = "Company (A-Z)";
+"list.sort.companyZA" = "Company (Z-A)";
+
+"list.filter.title" = "Filter";
+"list.filter.favorites" = "Favorites Only";
+"list.filter.savedToContacts" = "Saved to Contacts";
+"list.filter.clearAll" = "Clear All Filters";
+
+"list.action.delete" = "Delete";
+"list.action.favorite" = "Favorite";
+"list.action.unfavorite" = "Unfavorite";
+"list.action.share" = "Share";
+"list.action.edit" = "Edit";
+
+"list.swipe.delete.confirm.title" = "Delete Contact?";
+"list.swipe.delete.confirm.message" = "This will permanently delete %@ from your database. This cannot be undone.";
+"list.swipe.delete.confirm.delete" = "Delete";
+"list.swipe.delete.confirm.cancel" = "Cancel";
+
+// MARK: - Card Detail
+
+"detail.title" = "Contact Details";
+"detail.button.edit" = "Edit";
+"detail.button.share" = "Share";
+"detail.button.delete" = "Delete";
+"detail.button.addToContacts" = "Add to Contacts";
+"detail.button.updateInContacts" = "Update in Contacts";
+"detail.button.viewInContacts" = "View in Contacts";
+
+"detail.section.basic" = "Basic Information";
+"detail.section.contact" = "Contact Information";
+"detail.section.location" = "Location";
+"detail.section.notes" = "Notes";
+"detail.section.metadata" = "Card Info";
+
+"detail.label.name" = "Name";
+"detail.label.jobTitle" = "Job Title";
+"detail.label.company" = "Company";
+"detail.label.email" = "Email";
+"detail.label.phone" = "Phone";
+"detail.label.website" = "Website";
+"detail.label.address" = "Address";
+"detail.label.notes" = "Notes";
+"detail.label.dateScanned" = "Scanned";
+"detail.label.favorite" = "Favorite";
+"detail.label.savedToContacts" = "Saved to Contacts";
+
+"detail.empty.jobTitle" = "No job title";
+"detail.empty.company" = "No company";
+"detail.empty.email" = "No email";
+"detail.empty.phone" = "No phone";
+"detail.empty.website" = "No website";
+"detail.empty.address" = "No address";
+"detail.empty.notes" = "No notes";
+
+"detail.action.call" = "Call";
+"detail.action.message" = "Message";
+"detail.action.email" = "Email";
+"detail.action.visitWebsite" = "Visit Website";
+"detail.action.openMaps" = "Open in Maps";
+"detail.action.copyEmail" = "Copy Email";
+"detail.action.copyPhone" = "Copy Phone";
+"detail.action.copyWebsite" = "Copy Website";
+
+"detail.share.subject" = "Contact: %@";
+
+// MARK: - Settings
+
+"settings.title" = "Settings";
+
+"settings.section.scanning" = "Scanning";
+"settings.section.contacts" = "Contacts Integration";
+"settings.section.appearance" = "Appearance";
+"settings.section.privacy" = "Privacy";
+"settings.section.about" = "About";
+
+"settings.scanning.autoSave" = "Auto-save After Scan";
+"settings.scanning.autoSave.detail" = "Automatically save contacts without showing the review screen";
+"settings.scanning.haptics" = "Haptic Feedback";
+"settings.scanning.haptics.detail" = "Enable vibrations for scan success";
+"settings.scanning.soundEffects" = "Sound Effects";
+"settings.scanning.soundEffects.detail" = "Play sounds when scanning completes";
+
+"settings.contacts.autoSync" = "Auto-sync to Contacts";
+"settings.contacts.autoSync.detail" = "Automatically save all cards to iOS Contacts";
+"settings.contacts.syncExisting" = "Sync All Existing Cards";
+"settings.contacts.syncExisting.detail" = "Add all saved cards to Contacts";
+"settings.contacts.syncExisting.button" = "Sync %d Cards";
+"settings.contacts.syncExisting.syncing" = "Syncing...";
+"settings.contacts.syncExisting.complete" = "Sync Complete";
+
+"settings.appearance.appIcon" = "App Icon";
+"settings.appearance.theme" = "Theme";
+"settings.appearance.theme.system" = "System";
+"settings.appearance.theme.light" = "Light";
+"settings.appearance.theme.dark" = "Dark";
+
+"settings.privacy.dataLocation" = "Your Data";
+"settings.privacy.dataLocation.detail" = "All business cards are stored locally on your device. Nothing is uploaded to the cloud.";
+"settings.privacy.permissions" = "Permissions";
+"settings.privacy.permissions.detail" = "Manage camera and contacts access";
+"settings.privacy.policy" = "Privacy Policy";
+"settings.privacy.deleteAll" = "Delete All Data";
+"settings.privacy.deleteAll.detail" = "Permanently delete all saved business cards";
+
+"settings.about.version" = "Version";
+"settings.about.build" = "Build";
+"settings.about.developer" = "Made with care";
+"settings.about.feedback" = "Send Feedback";
+"settings.about.rateApp" = "Rate Deets";
+"settings.about.shareApp" = "Share with Friends";
+
+"settings.deleteAll.confirm.title" = "Delete All Data?";
+"settings.deleteAll.confirm.message" = "This will permanently delete all %d business cards from your device. This cannot be undone.";
+"settings.deleteAll.confirm.delete" = "Delete All";
+"settings.deleteAll.confirm.cancel" = "Cancel";
+
+// MARK: - Permissions
+
+"permissions.camera.title" = "Camera Access Required";
+"permissions.camera.message" = "Deets needs camera access to scan business cards with your iPhone's camera.";
+"permissions.camera.usage" = "We use your camera to scan business cards. Photos are never stored or shared.";
+
+"permissions.contacts.title" = "Contacts Access (Optional)";
+"permissions.contacts.message" = "Save scanned cards directly to your Contacts app for easy access across iOS.";
+"permissions.contacts.usage" = "We save business card information to your Contacts. You can skip this and save to Deets only.";
+
+"permissions.button.allow" = "Allow";
+"permissions.button.notNow" = "Not Now";
+"permissions.button.openSettings" = "Open Settings";
+
+// MARK: - Accessibility
+
+"accessibility.button" = "Button";
+"accessibility.cancel" = "Cancel";
+"accessibility.scannerCancel" = "Cancel scanning";
+"accessibility.scannerCancel.hint" = "Double tap to close scanner";
+"accessibility.cardsList" = "Business cards list";
+"accessibility.discard" = "Discard this contact";
+"accessibility.sortOptions" = "Sort options";
+"accessibility.filterOptions" = "Filter options";
+"accessibility.activeFilters" = "Active filters";
+
+// MARK: - Generic Actions
+
+"action.save" = "Save";
+"action.cancel" = "Cancel";
+"action.done" = "Done";
+"action.edit" = "Edit";
+"action.delete" = "Delete";
+"action.share" = "Share";
+"action.close" = "Close";
+"action.retry" = "Retry";
+"action.ok" = "OK";
+"action.yes" = "Yes";
+"action.no" = "No";
+
+// MARK: - Generic Messages
+
+"message.loading" = "Loading...";
+"message.saving" = "Saving...";
+"message.deleting" = "Deleting...";
+"message.processing" = "Processing...";
+"message.success" = "Success!";
+"message.error" = "Error";
+
+// MARK: - Date Formatting
+
+"date.today" = "Today";
+"date.yesterday" = "Yesterday";
+"date.daysAgo" = "%d days ago";
+"date.weeksAgo" = "%d weeks ago";
+"date.monthsAgo" = "%d months ago";
+
+// MARK: - Counts
+
+"count.cards.zero" = "No cards";
+"count.cards.one" = "1 card";
+"count.cards.many" = "%d cards";
+
+"count.results.zero" = "No results";
+"count.results.one" = "1 result";
+"count.results.many" = "%d results";

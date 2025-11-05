@@ -1,0 +1,359 @@
+# Fastlane Configuration for Deets
+# Documentation: https://docs.fastlane.tools
+
+default_platform(:ios)
+
+# Environment Variables Expected:
+# - MATCH_PASSWORD: Passphrase for match certificates
+# - MATCH_GIT_URL: Git repository for certificates
+# - FASTLANE_APPLE_ID: Apple Developer account email
+# - APP_STORE_CONNECT_API_KEY_ID: App Store Connect API key ID
+# - APP_STORE_CONNECT_API_ISSUER_ID: App Store Connect API issuer ID
+# - APP_STORE_CONNECT_API_KEY_CONTENT: Base64-encoded API key content
+
+platform :ios do
+  # Build number management
+  before_all do
+    ensure_git_status_clean unless ENV['CI']
+    setup_ci if ENV['CI']
+  end
+
+  # ============================================================================
+  # BUILD LANES
+  # ============================================================================
+
+  desc "Build the app for testing"
+  desc "Usage: fastlane build_for_testing"
+  lane :build_for_testing do
+    scan(
+      build_for_testing: true,
+      scheme: "Deets",
+      clean: true,
+      derived_data_path: "DerivedData",
+      result_bundle: true,
+      code_coverage: true
+    )
+  end
+
+  desc "Run tests without building"
+  desc "Usage: fastlane test_without_building"
+  lane :test_without_building do
+    scan(
+      test_without_building: true,
+      scheme: "Deets",
+      derived_data_path: "DerivedData",
+      result_bundle: true,
+      code_coverage: true,
+      output_directory: "fastlane/test_output",
+      output_types: "html,junit",
+      fail_build: true
+    )
+  end
+
+  desc "Build and test in one step"
+  desc "Usage: fastlane test"
+  lane :test do
+    scan(
+      scheme: "Deets",
+      clean: true,
+      derived_data_path: "DerivedData",
+      result_bundle: true,
+      code_coverage: true,
+      output_directory: "fastlane/test_output",
+      output_types: "html,junit",
+      fail_build: true
+    )
+  end
+
+  desc "Build for release (archive)"
+  desc "Usage: fastlane build_release"
+  lane :build_release do
+    increment_build_number(xcodeproj: "Deets.xcodeproj")
+
+    gym(
+      scheme: "Deets",
+      clean: true,
+      export_method: "app-store",
+      derived_data_path: "DerivedData",
+      output_directory: "fastlane/builds",
+      output_name: "Deets.ipa",
+      include_bitcode: false,
+      include_symbols: true,
+      export_xcargs: "-allowProvisioningUpdates"
+    )
+  end
+
+  # ============================================================================
+  # CODE QUALITY LANES
+  # ============================================================================
+
+  desc "Run SwiftLint"
+  desc "Usage: fastlane lint"
+  lane :lint do
+    swiftlint(
+      mode: :lint,
+      config_file: ".swiftlint.yml",
+      raise_if_swiftlint_error: true,
+      ignore_exit_status: false
+    )
+  end
+
+  desc "Auto-fix SwiftLint violations"
+  desc "Usage: fastlane lint_fix"
+  lane :lint_fix do
+    swiftlint(
+      mode: :autocorrect,
+      config_file: ".swiftlint.yml"
+    )
+  end
+
+  desc "Run all quality checks"
+  desc "Usage: fastlane quality"
+  lane :quality do
+    lint
+    test
+
+    # Generate code coverage report
+    slather(
+      scheme: "Deets",
+      proj: "Deets.xcodeproj",
+      cobertura_xml: true,
+      html: true,
+      output_directory: "fastlane/coverage",
+      ignore: ["DeetsTests/*", "Pods/*", ".build/*"]
+    )
+  end
+
+  # ============================================================================
+  # CERTIFICATE & PROVISIONING LANES
+  # ============================================================================
+
+  desc "Sync code signing certificates and profiles (Development)"
+  desc "Usage: fastlane sync_dev_certs"
+  lane :sync_dev_certs do
+    match(
+      type: "development",
+      app_identifier: "com.deets.app",
+      readonly: is_ci,
+      git_url: ENV['MATCH_GIT_URL']
+    )
+  end
+
+  desc "Sync code signing certificates and profiles (App Store)"
+  desc "Usage: fastlane sync_appstore_certs"
+  lane :sync_appstore_certs do
+    match(
+      type: "appstore",
+      app_identifier: "com.deets.app",
+      readonly: is_ci,
+      git_url: ENV['MATCH_GIT_URL']
+    )
+  end
+
+  desc "Register new devices and update provisioning profiles"
+  desc "Usage: fastlane register_devices"
+  lane :register_devices do
+    register_devices(devices_file: "./fastlane/devices.txt")
+    match(
+      type: "development",
+      app_identifier: "com.deets.app",
+      force_for_new_devices: true,
+      git_url: ENV['MATCH_GIT_URL']
+    )
+  end
+
+  # ============================================================================
+  # DEPLOYMENT LANES
+  # ============================================================================
+
+  desc "Upload to TestFlight"
+  desc "Usage: fastlane beta"
+  lane :beta do
+    # Ensure we're on a clean git state
+    ensure_git_status_clean unless ENV['CI']
+
+    # Sync certificates
+    sync_appstore_certs
+
+    # Increment build number
+    increment_build_number(xcodeproj: "Deets.xcodeproj")
+
+    # Build the app
+    gym(
+      scheme: "Deets",
+      clean: true,
+      export_method: "app-store",
+      derived_data_path: "DerivedData",
+      output_directory: "fastlane/builds",
+      output_name: "Deets.ipa"
+    )
+
+    # Upload to TestFlight
+    pilot(
+      skip_waiting_for_build_processing: false,
+      distribute_external: false,
+      changelog: changelog_from_git_commits(
+        commits_count: 5,
+        pretty: "- %s",
+        merge_commit_filtering: "exclude_merges"
+      )
+    )
+
+    # Commit version bump
+    unless ENV['CI']
+      commit_version_bump(
+        message: "chore: bump build number for TestFlight",
+        xcodeproj: "Deets.xcodeproj"
+      )
+      push_to_git_remote
+    end
+
+    # Notify on success
+    slack(
+      message: "Deets successfully uploaded to TestFlight! 🚀",
+      success: true
+    ) if ENV['SLACK_WEBHOOK_URL']
+  end
+
+  desc "Deploy to App Store"
+  desc "Usage: fastlane release"
+  lane :release do
+    # Ensure we're on main branch
+    ensure_git_branch(branch: 'main')
+    ensure_git_status_clean unless ENV['CI']
+
+    # Run quality checks
+    quality
+
+    # Sync certificates
+    sync_appstore_certs
+
+    # Update version number
+    prompt_version = prompt(
+      text: "Enter version number (current: #{get_version_number(xcodeproj: 'Deets.xcodeproj')}):",
+      ci_input: get_version_number(xcodeproj: 'Deets.xcodeproj')
+    )
+    increment_version_number(
+      version_number: prompt_version,
+      xcodeproj: "Deets.xcodeproj"
+    )
+    increment_build_number(xcodeproj: "Deets.xcodeproj")
+
+    # Build the app
+    gym(
+      scheme: "Deets",
+      clean: true,
+      export_method: "app-store",
+      derived_data_path: "DerivedData",
+      output_directory: "fastlane/builds",
+      output_name: "Deets.ipa"
+    )
+
+    # Upload to App Store
+    deliver(
+      submit_for_review: false,
+      automatic_release: false,
+      force: true,
+      metadata_path: "./fastlane/metadata",
+      screenshots_path: "./fastlane/screenshots",
+      skip_metadata: false,
+      skip_screenshots: false
+    )
+
+    # Create git tag
+    unless ENV['CI']
+      add_git_tag(
+        tag: "v#{prompt_version}",
+        message: "Release v#{prompt_version}"
+      )
+      push_git_tags
+
+      commit_version_bump(
+        message: "chore: release v#{prompt_version}",
+        xcodeproj: "Deets.xcodeproj"
+      )
+      push_to_git_remote
+    end
+
+    # Notify on success
+    slack(
+      message: "Deets v#{prompt_version} successfully submitted to App Store! 🎉",
+      success: true
+    ) if ENV['SLACK_WEBHOOK_URL']
+  end
+
+  # ============================================================================
+  # UTILITY LANES
+  # ============================================================================
+
+  desc "Take screenshots for App Store"
+  desc "Usage: fastlane screenshots"
+  lane :screenshots do
+    snapshot(
+      scheme: "DeetsUITests",
+      output_directory: "fastlane/screenshots",
+      clear_previous_screenshots: true,
+      reinstall_app: true,
+      erase_simulator: true
+    )
+
+    frameit(
+      path: "fastlane/screenshots",
+      silver: true
+    )
+  end
+
+  desc "Generate metadata for App Store Connect"
+  desc "Usage: fastlane metadata"
+  lane :metadata do
+    deliver(
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      metadata_path: "./fastlane/metadata"
+    )
+  end
+
+  desc "Clean build artifacts"
+  desc "Usage: fastlane clean"
+  lane :clean do
+    clear_derived_data
+    sh("rm -rf ../fastlane/builds")
+    sh("rm -rf ../fastlane/test_output")
+    sh("rm -rf ../fastlane/coverage")
+    UI.success("Cleaned all build artifacts ✨")
+  end
+
+  desc "Setup project after clone"
+  desc "Usage: fastlane setup"
+  lane :setup do
+    sh("bundle install")
+
+    # Install SwiftLint if not present
+    unless sh("which swiftlint", log: false).empty?
+      UI.message("SwiftLint already installed")
+    else
+      UI.message("Installing SwiftLint...")
+      sh("brew install swiftlint")
+    end
+
+    # Generate Xcode project
+    sh("xcodegen generate")
+
+    UI.success("Project setup complete! ✅")
+  end
+
+  # ============================================================================
+  # ERROR HANDLING
+  # ============================================================================
+
+  error do |lane, exception, options|
+    slack(
+      message: "Error in lane #{lane}: #{exception.message}",
+      success: false
+    ) if ENV['SLACK_WEBHOOK_URL']
+  end
+
+  after_all do |lane|
+    UI.success("Lane #{lane} completed successfully! ✅")
+  end
+end

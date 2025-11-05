@@ -1,0 +1,355 @@
+# Deets - What's New Template
+
+Version: 1.0.0
+Last Updated: 2025-11-05
+Owner: LUMEN (Brand & App Store Assets Lead)
+
+---
+
+## TEMPLATE: VERSION 1.0.0 (INITIAL RELEASE)
+
+Character Limit: 4000 (recommended 500-1000)
+Character Count: 1247
+
+---
+
+Welcome to Deets 1.0!
+
+The privacy-first business card scanner is here.
+
+NEW IN THIS RELEASE
+
+• Fast scanning with VisionKit
+Point your camera at a business card and watch Deets automatically extract contact information.
+
+• Smart contact parsing
+Name, title, company, email, phone, website—all organized for you.
+
+• Export anywhere
+Save to Apple Contacts, export to VCF, or share via CSV. Your data, your choice.
+
+• Offline-first design
+Everything works without internet. Perfect for conferences, trade shows, or travel.
+
+• Private by default
+All processing happens on your device. No cloud, no tracking, no accounts.
+
+• Optional iCloud sync
+Turn on iCloud sync in Settings to keep contacts across your devices. Still encrypted by Apple.
+
+• Search and favorites
+Find contacts instantly. Mark important ones as favorites.
+
+• Dark mode support
+Automatically adapts to your system appearance.
+
+• Accessibility built-in
+Full VoiceOver support and Dynamic Type for all users.
+
+FEEDBACK WELCOME
+
+We're a small team building the business card scanner we always wanted. If you have suggestions or find bugs, email us at support@deets.app.
+
+Thanks for downloading Deets!
+
+---
+
+Meet once. Remember always.
+
+---
+
+## TEMPLATE: VERSION 1.1.0 (BUG FIXES)
+
+Character Count: 428
+
+---
+
+Deets 1.1 - Bug Fixes and Improvements
+
+FIXED IN THIS UPDATE
+
+• Improved OCR accuracy for handwritten business cards
+• Fixed crash when scanning in low light conditions
+• Better contact parsing for international phone numbers
+• Resolved issue with iCloud sync not triggering
+• Performance improvements for large contact libraries
+
+MINOR IMPROVEMENTS
+
+• Faster export to Apple Contacts
+• Updated privacy policy link in Settings
+• Refined scan button animation
+• Accessibility improvements for VoiceOver
+
+As always, email support@deets.app with feedback or bug reports.
+
+---
+
+## TEMPLATE: VERSION 1.2.0 (MINOR FEATURE UPDATE)
+
+Character Count: 612
+
+---
+
+Deets 1.2 - New Features and Improvements
+
+NEW FEATURES
+
+• Batch scanning: Scan multiple business cards in one session
+Hold down the scan button to enter batch mode. Great for conference hauls!
+
+• Custom tags: Organize contacts your way
+Add tags like "Conference 2025", "Client", "Vendor" to any contact.
+
+• Advanced search: Filter by tag, company, or date added
+Find exactly who you're looking for, fast.
+
+IMPROVEMENTS
+
+• Faster OCR processing (30% speed boost)
+• Better low-light camera performance
+• Enhanced contact de-duplication
+• Improved export formats (VCF 4.0 support)
+
+BUG FIXES
+
+• Fixed rare crash when exporting large contact lists
+• Resolved UI glitch on iPad landscape mode
+
+Email support@deets.app with questions or feedback.
+
+---
+
+## TEMPLATE: VERSION 2.0.0 (MAJOR UPDATE)
+
+Character Count: 891
+
+---
+
+Deets 2.0 - Major Update
+
+We've rebuilt Deets from the ground up with your feedback.
+
+WHAT'S NEW
+
+• AI-powered parsing: Even better contact extraction
+Using on-device machine learning, Deets now handles complex card layouts, multiple languages, and unusual formats.
+
+• Business card photo storage: Never lose the original
+Deets saves a photo of each card (encrypted, on-device). Review the original anytime.
+
+• Contact notes with reminders: Remember where you met
+Add notes, set follow-up reminders, track conversations. All private, all local.
+
+• Advanced export options: More formats, more flexibility
+New: Export to Salesforce, HubSpot, or custom CSV templates.
+
+• iPad optimization: Full multitasking support
+Drag and drop contacts between apps, Split View support, keyboard shortcuts.
+
+IMPROVEMENTS
+
+• Redesigned UI following iOS 18 guidelines
+• 50% faster scanning
+• Better accessibility (100% VoiceOver coverage)
+• Enhanced iCloud sync reliability
+
+Privacy promise: Everything still happens on your device. No cloud. No tracking.
+
+Questions? support@deets.app
+
+---
+
+## TEMPLATE: SEASONAL UPDATE (CONFERENCE SEASON)
+
+Character Count: 487
+
+---
+
+Deets 1.3 - Conference Season Edition
+
+PERFECT FOR NETWORKING EVENTS
+
+• Rapid scan mode: Scan 10+ cards in under a minute
+New gesture: Swipe to scan next card without returning to menu.
+
+• "Recently added" smart list: Review today's connections
+Filter contacts scanned in the last 24 hours, 7 days, or 30 days.
+
+• Batch export with notes: Share your haul with your team
+Export all conference contacts as CSV with your notes included.
+
+IMPROVEMENTS
+
+• Better OCR for event badges and non-standard cards
+• Offline mode indicator (know when you're ready for airplane mode)
+• Quick add to favorites from scan preview
+
+Heading to a conference? Deets has your back.
+
+support@deets.app
+
+---
+
+## WRITING GUIDELINES FOR "WHAT'S NEW"
+
+### DO:
+✅ Start with version number and brief summary
+✅ Use bullet points (easier to scan)
+✅ Group changes by category (New, Improved, Fixed)
+✅ Explain WHY features matter (not just WHAT changed)
+✅ Keep language conversational ("We've rebuilt..." not "The app has been rebuilt...")
+✅ End with contact info or call-to-action
+✅ Include brand tagline at end (initial release only)
+
+### DON'T:
+❌ Just list generic "Bug fixes and improvements"
+❌ Use jargon or technical terms (e.g., "Refactored SwiftData layer")
+❌ Make promises you can't keep ("Never crashes again!")
+❌ Write in third person ("This update includes...")
+❌ Over-hype minor changes ("Revolutionary new feature: bug fix!")
+❌ Forget to thank users
+
+### TONE:
+- **Confident**: We know what we're doing
+- **Human**: Talk to users, not at them
+- **Clear**: No marketing speak, just facts
+- **Appreciative**: Thank users for feedback
+
+---
+
+## CHANGE CATEGORIES
+
+### NEW FEATURES (Major)
+"NEW IN THIS RELEASE" or "WHAT'S NEW"
+- New screens or workflows
+- Brand new functionality
+- Major redesigns
+
+### IMPROVEMENTS (Minor)
+"IMPROVEMENTS" or "ENHANCEMENTS"
+- Performance boosts
+- UI refinements
+- Better accuracy or speed
+
+### BUG FIXES (Maintenance)
+"FIXED IN THIS UPDATE" or "BUG FIXES"
+- Crashes resolved
+- UI glitches fixed
+- Data sync issues resolved
+
+---
+
+## SEASONAL VARIATIONS
+
+### Conference Season (Feb-May, Sep-Oct)
+- Highlight batch scanning
+- Mention offline capabilities
+- Emphasize fast workflow
+
+### End of Year (Nov-Dec)
+- Networking recap features
+- Contact cleanup tools
+- Export for year-end reviews
+
+### New Year (Jan)
+- Contact organization
+- Fresh start messaging
+- Goal-setting features (if applicable)
+
+---
+
+## VERSION NUMBERING GUIDE
+
+### Major (X.0.0)
+- Complete redesigns
+- New core features
+- Breaking changes (rare)
+
+### Minor (1.X.0)
+- New features
+- Significant improvements
+- No breaking changes
+
+### Patch (1.0.X)
+- Bug fixes only
+- Performance improvements
+- Minor UI tweaks
+
+---
+
+## CHARACTER LIMITS & FORMATTING
+
+**App Store Limit**: 4000 characters
+**Recommended Length**: 500-1000 characters
+**Minimum**: 200 characters (avoid "Bug fixes and improvements" only)
+
+**Formatting**:
+- Use bullet points (• ) for lists
+- Use line breaks generously (easy scanning)
+- BOLD for category headers (NEW, IMPROVEMENTS, FIXED)
+- Keep paragraphs to 2-3 sentences max
+
+---
+
+## A/B TESTING NOTES
+
+### Test 1: Detailed vs Brief
+**Variant A**: Detailed explanations (800 chars)
+**Variant B**: Brief bullet points (300 chars)
+Measure: Update adoption rate
+
+### Test 2: Feature-Focus vs User-Benefit
+**Variant A**: "Added batch scanning feature"
+**Variant B**: "Scan 10+ cards in under a minute"
+Measure: User engagement with feature
+
+---
+
+## APPROVAL PROCESS
+
+1. **Developer writes draft** (what changed technically)
+2. **LUMEN rewrites for users** (why it matters)
+3. **Test internally** (read aloud, check tone)
+4. **Submit to App Store** (via App Store Connect)
+
+**Timeline**: Write "What's New" BEFORE submitting app update (not after).
+
+---
+
+## LOCALIZATION
+
+### English (Default)
+Use templates above
+
+### Future Languages
+Translate full text, maintaining:
+- Bullet structure
+- Paragraph breaks
+- Tone (confident, human, clear)
+
+**Priority Languages**:
+1. Spanish
+2. French
+3. German
+4. Japanese
+5. Chinese (Simplified)
+
+---
+
+## VERSION HISTORY
+
+| Version | Date | Release Notes Summary |
+|---------|------|----------------------|
+| 1.0.0 | 2025-11-05 | Initial release with privacy-first scanning |
+
+---
+
+## CONTACT
+
+For release notes questions:
+Email: brand@deets.app
+Owner: LUMEN (Brand & App Store Assets Lead)
+
+Last Updated: 2025-11-05
+Version: 1.0.0

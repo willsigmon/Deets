@@ -1,0 +1,14 @@
+# Device registration file for development provisioning profiles
+# Format: Device ID<tab>Device Name
+#
+# To get device UDID:
+# 1. Connect device to Mac
+# 2. Open Finder > Select device
+# 3. Click on device info until UDID appears
+# 4. Right-click > Copy UDID
+#
+# Example entries:
+# 00008030-001234567890ABCD    John's iPhone 15 Pro
+# 00008030-FEDCBA0987654321    Jane's iPhone 14
+#
+# Add your team's devices below:

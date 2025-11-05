@@ -1,0 +1,17 @@
+/*
+  InfoPlist.strings
+  Deets
+
+  Localized permission descriptions for Info.plist
+  These appear in iOS permission dialogs
+*/
+
+/* Camera Permission */
+"NSCameraUsageDescription" = "Deets needs camera access to scan business cards. Point your camera at a card to instantly capture contact information.";
+
+/* Contacts Permission */
+"NSContactsUsageDescription" = "Deets can save business cards directly to your Contacts app for easy access across iOS. This is optional—you can save to Deets only if you prefer.";
+
+/* Photo Library Permission (if needed for future features) */
+"NSPhotoLibraryUsageDescription" = "Deets can scan business cards from your photo library.";
+"NSPhotoLibraryAddUsageDescription" = "Deets can save business card images to your photo library.";

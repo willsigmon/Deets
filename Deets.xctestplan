@@ -1,0 +1,57 @@
+{
+  "configurations" : [
+    {
+      "id" : "7E9F4C86-4C8E-4B9E-8C8E-4C8E4B9E8C8E",
+      "name" : "Test Scheme Action",
+      "options" : {
+        "codeCoverage" : {
+          "targets" : [
+            {
+              "containerPath" : "container:Deets.xcodeproj",
+              "identifier" : "DeetsKit",
+              "name" : "DeetsKit"
+            }
+          ]
+        },
+        "commandLineArgumentEntries" : [
+          {
+            "argument" : "-TESTING",
+            "enabled" : true
+          }
+        ],
+        "environmentVariableEntries" : [
+          {
+            "key" : "IS_UNIT_TESTING",
+            "value" : "1"
+          }
+        ],
+        "language" : "en",
+        "region" : "US",
+        "targetForVariableExpansion" : {
+          "containerPath" : "container:Deets.xcodeproj",
+          "identifier" : "Deets",
+          "name" : "Deets"
+        }
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Deets.xcodeproj",
+      "identifier" : "Deets",
+      "name" : "Deets"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Deets.xcodeproj",
+        "identifier" : "DeetsKitTests",
+        "name" : "DeetsKitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

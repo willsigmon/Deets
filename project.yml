@@ -1,0 +1,64 @@
+# XcodeGen Project Configuration for Deets
+# Run: xcodegen generate
+
+name: Deets
+
+options:
+  bundleIdPrefix: com.deets
+  deploymentTarget:
+    iOS: 16.0
+  developmentLanguage: en
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: 5.9
+    DEVELOPMENT_TEAM: # Add your team ID here
+    MARKETING_VERSION: 1.0.0
+    CURRENT_PROJECT_VERSION: 1
+
+targets:
+  Deets:
+    type: application
+    platform: iOS
+
+    sources:
+      - Deets
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.deets.app
+        INFOPLIST_FILE: Deets/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        TARGETED_DEVICE_FAMILY: 1 # iPhone only
+        SWIFT_EMIT_LOC_STRINGS: true
+        ENABLE_PREVIEWS: true
+        SWIFT_STRICT_CONCURRENCY: complete
+
+    info:
+      path: Deets/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Deets
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+        UIRequiredDeviceCapabilities:
+          - camera-flash
+          - still-camera
+        NSCameraUsageDescription: "Deets needs camera access to scan business cards and extract contact information"
+        NSContactsUsageDescription: "Deets saves scanned business cards to your contacts for easy access"
+
+    dependencies: []
+
+    scheme:
+      testTargets: []
+      gatherCoverageData: false
+
+    preBuildScripts: []
+
+    postBuildScripts: []

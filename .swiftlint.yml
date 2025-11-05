@@ -1,0 +1,216 @@
+# SwiftLint Configuration for Deets
+# Enforces Swift style and conventions
+# Documentation: https://realm.github.io/SwiftLint/
+
+# Paths to include during linting
+included:
+  - Deets
+  - Config
+  - Examples
+  - DeetsTests
+
+# Paths to ignore during linting
+excluded:
+  - Pods
+  - .build
+  - DerivedData
+  - Package.swift
+  - Resources
+
+# Enable all rules by default, then disable specific ones
+opt_in_rules:
+  - array_init
+  - attributes
+  - closure_end_indentation
+  - closure_spacing
+  - conditional_returns_on_newline
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - contains_over_range_nil_comparison
+  - convenience_type
+  - discouraged_object_literal
+  - empty_collection_literal
+  - empty_count
+  - empty_string
+  - enum_case_associated_values_count
+  - explicit_init
+  - extension_access_modifier
+  - fallthrough
+  - fatal_error_message
+  - file_header
+  - first_where
+  - flatmap_over_map_reduce
+  - identical_operands
+  - implicit_return
+  - joined_default_parameter
+  - last_where
+  - legacy_multiple
+  - literal_expression_end_indentation
+  - lower_acl_than_parent
+  - modifier_order
+  - multiline_arguments
+  - multiline_function_chains
+  - multiline_literal_brackets
+  - multiline_parameters
+  - multiline_parameters_brackets
+  - operator_usage_whitespace
+  - overridden_super_call
+  - override_in_extension
+  - pattern_matching_keywords
+  - prefer_self_type_over_type_of_self
+  - private_action
+  - private_outlet
+  - prohibited_interface_builder
+  - prohibited_super_call
+  - quick_discouraged_call
+  - quick_discouraged_focused_test
+  - quick_discouraged_pending_test
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - single_test_class
+  - sorted_first_last
+  - static_operator
+  - toggle_bool
+  - trailing_closure
+  - unavailable_function
+  - unneeded_parentheses_in_closure_argument
+  - unowned_variable_capture
+  - vertical_parameter_alignment_on_call
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - weak_delegate
+  - yoda_condition
+
+# Disabled rules
+disabled_rules:
+  - todo # Allow TODO comments during development
+  - trailing_comma # Personal preference
+
+# Rule customization
+line_length:
+  warning: 120
+  error: 150
+  ignores_function_declarations: true
+  ignores_comments: true
+  ignores_urls: true
+
+file_length:
+  warning: 500
+  error: 1000
+  ignore_comment_only_lines: true
+
+function_body_length:
+  warning: 40
+  error: 100
+
+function_parameter_count:
+  warning: 5
+  error: 8
+
+type_body_length:
+  warning: 300
+  error: 500
+
+type_name:
+  min_length: 3
+  max_length:
+    warning: 40
+    error: 50
+  excluded:
+    - ID
+    - URL
+    - OCR
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 40
+    error: 60
+  excluded:
+    - id
+    - URL
+    - url
+    - x
+    - y
+    - z
+    - i
+    - j
+    - k
+
+nesting:
+  type_level:
+    warning: 2
+    error: 3
+
+cyclomatic_complexity:
+  warning: 10
+  error: 20
+  ignores_case_statements: true
+
+# Force unwrapping should be avoided (use guard/if let)
+force_unwrapping: warning
+
+# Force cast should be avoided
+force_cast: warning
+
+# Implicitly unwrapped optionals should be avoided
+implicitly_unwrapped_optional:
+  mode: all_except_iboutlets
+
+# Enforce access control
+explicit_acl:
+  severity: warning
+
+# Enforce @IBOutlet to be weak
+iboutlet_weak: error
+
+# Custom reporter (optional)
+reporter: "xcode"
+
+# Strict mode for CI/CD (fail on warnings)
+strict: false # Set to true in CI
+
+# SwiftLint version check
+swiftlint_version: 0.55.0
+
+# Custom rules
+custom_rules:
+  # Avoid print statements in production code
+  no_print:
+    name: "Print Statement"
+    regex: "print\\("
+    match_kinds:
+      - identifier
+    message: "Use os_log or Logger instead of print()"
+    severity: warning
+
+  # Enforce copyright header (optional)
+  file_header_format:
+    name: "File Header"
+    regex: "//\\s*Created by.*on"
+    message: "Standard file header expected"
+    severity: warning
+
+  # Discourage force try
+  discouraged_force_try:
+    name: "Force Try"
+    regex: "try!"
+    message: "Use proper error handling instead of try!"
+    severity: warning
+
+  # SwiftData @Model should not have init
+  swiftdata_model_init:
+    name: "SwiftData Model Init"
+    regex: "@Model[\\s\\S]*?\\binit\\("
+    message: "SwiftData @Model classes should use memberwise init"
+    severity: warning
+
+  # Actor isolation best practices
+  actor_isolated_property:
+    name: "Actor Isolated Property"
+    regex: "actor\\s+\\w+[\\s\\S]*?@MainActor\\s+var"
+    message: "Avoid mixing actor isolation - keep all properties on same actor"
+    severity: warning

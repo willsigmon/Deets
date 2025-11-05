@@ -1,0 +1,352 @@
+name: iOS Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - testflight
+          - appstore
+        default: testflight
+      skip_tests:
+        description: 'Skip tests'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
+  FASTLANE_SKIP_UPDATE_CHECK: true
+  FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
+  FASTLANE_XCODE_LIST_TIMEOUT: 180
+
+jobs:
+  # ============================================================================
+  # PRE-FLIGHT CHECKS
+  # ============================================================================
+  preflight:
+    name: Pre-flight Checks
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version tag format
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid tag format: $TAG (expected: v1.0.0)"
+            exit 1
+          fi
+          echo "✅ Valid version tag: $TAG"
+
+      - name: Check CHANGELOG.md updated
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          if ! grep -q "$TAG" CHANGELOG.md 2>/dev/null; then
+            echo "⚠️  Warning: CHANGELOG.md does not mention $TAG"
+          else
+            echo "✅ CHANGELOG.md contains $TAG"
+          fi
+
+      - name: Install dependencies
+        run: |
+          brew install xcodegen
+          gem install bundler
+          bundle install
+
+      - name: Run SwiftLint
+        run: |
+          brew install swiftlint
+          swiftlint lint --strict
+
+  # ============================================================================
+  # RUN TESTS (unless skipped)
+  # ============================================================================
+  test:
+    name: Run Test Suite
+    runs-on: macos-14
+    needs: preflight
+    if: github.event.inputs.skip_tests != 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            DerivedData/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+
+      - name: Install dependencies
+        run: |
+          brew install xcodegen
+          bundle install
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Run tests
+        run: bundle exec fastlane test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: fastlane/test_output/
+          retention-days: 90
+
+  # ============================================================================
+  # BUILD & SIGN
+  # ============================================================================
+  build:
+    name: Build & Sign App
+    runs-on: macos-14
+    needs: [preflight, test]
+    if: always() && needs.preflight.result == 'success' && (needs.test.result == 'success' || needs.test.result == 'skipped')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+      - name: Cache SPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            DerivedData/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+
+      - name: Install dependencies
+        run: |
+          brew install xcodegen
+          gem install bundler
+          bundle install
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Setup code signing
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+        run: |
+          bundle exec fastlane sync_appstore_certs
+
+      - name: Build IPA
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+        run: bundle exec fastlane build_release
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Deets-IPA
+          path: fastlane/builds/Deets.ipa
+          retention-days: 90
+
+      - name: Upload dSYM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Deets-dSYM
+          path: fastlane/builds/Deets.app.dSYM.zip
+          retention-days: 90
+
+  # ============================================================================
+  # DEPLOY TO TESTFLIGHT
+  # ============================================================================
+  deploy-testflight:
+    name: Deploy to TestFlight
+    runs-on: macos-14
+    needs: build
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      (github.event.inputs.release_type == 'testflight' || github.event.inputs.release_type == '')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: Deets-IPA
+          path: fastlane/builds
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+        run: |
+          # Configure App Store Connect API
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY_CONTENT" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
+
+          # Upload to TestFlight
+          bundle exec fastlane pilot upload \
+            --ipa fastlane/builds/Deets.ipa \
+            --api_key_path ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8 \
+            --skip_waiting_for_build_processing false \
+            --distribute_external false
+
+      - name: Create GitHub Release (TestFlight)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            fastlane/builds/Deets.ipa
+          draft: false
+          prerelease: true
+          generate_release_notes: true
+          body: |
+            ## TestFlight Build
+
+            This build has been uploaded to TestFlight for internal testing.
+
+            ### What's Changed
+            See the [CHANGELOG](./CHANGELOG.md) for details.
+
+  # ============================================================================
+  # DEPLOY TO APP STORE
+  # ============================================================================
+  deploy-appstore:
+    name: Deploy to App Store
+    runs-on: macos-14
+    needs: build
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      github.event.inputs.release_type == 'appstore'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: Deets-IPA
+          path: fastlane/builds
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Submit to App Store
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+        run: |
+          # Configure App Store Connect API
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY_CONTENT" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
+
+          # Submit to App Store
+          bundle exec fastlane deliver \
+            --ipa fastlane/builds/Deets.ipa \
+            --api_key_path ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8 \
+            --submit_for_review false \
+            --automatic_release false \
+            --force true \
+            --skip_metadata false \
+            --skip_screenshots false
+
+      - name: Create GitHub Release (App Store)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            fastlane/builds/Deets.ipa
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## App Store Release
+
+            This build has been submitted to the App Store for review.
+
+            ### What's Changed
+            See the [CHANGELOG](./CHANGELOG.md) for details.
+
+  # ============================================================================
+  # NOTIFICATION
+  # ============================================================================
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-testflight, deploy-appstore]
+    if: always()
+
+    steps:
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [[ "${{ needs.deploy-testflight.result }}" == "success" ]]; then
+            MESSAGE="✅ Deets successfully deployed to TestFlight!"
+          elif [[ "${{ needs.deploy-appstore.result }}" == "success" ]]; then
+            MESSAGE="✅ Deets successfully submitted to App Store!"
+          else
+            MESSAGE="❌ Deets deployment failed. Check GitHub Actions for details."
+          fi
+
+          curl -X POST $SLACK_WEBHOOK_URL \
+            -H 'Content-Type: application/json' \
+            -d "{\"text\":\"$MESSAGE\"}"
+
+      - name: Summary
+        run: |
+          echo "# Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Pre-flight: ${{ needs.preflight.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Tests: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build: ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- TestFlight: ${{ needs.deploy-testflight.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- App Store: ${{ needs.deploy-appstore.result }}" >> $GITHUB_STEP_SUMMARY

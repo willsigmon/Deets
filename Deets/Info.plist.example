@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Required: Contacts permission usage description -->
+    <key>NSContactsUsageDescription</key>
+    <string>Deets needs access to your Contacts to save business card information directly to your address book.</string>
+
+    <!-- Optional: Additional permissions you may need -->
+    <key>NSCameraUsageDescription</key>
+    <string>Deets needs camera access to scan business cards.</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Deets needs photo library access to import business card images.</string>
+
+    <!-- App configuration -->
+    <key>CFBundleDisplayName</key>
+    <string>Deets</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+</dict>
+</plist>

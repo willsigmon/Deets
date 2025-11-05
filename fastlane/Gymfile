@@ -1,0 +1,60 @@
+# Fastlane Gymfile - Build Configuration
+# Documentation: https://docs.fastlane.tools/actions/gym/
+
+# Scheme to build
+scheme("Deets")
+
+# Clean build folder before building
+clean(true)
+
+# Export method (app-store, ad-hoc, enterprise, development)
+export_method("app-store")
+
+# Build configuration (Release, Debug)
+configuration("Release")
+
+# Output directory for builds
+output_directory("./fastlane/builds")
+
+# Output name for IPA file
+output_name("Deets.ipa")
+
+# Include bitcode (deprecated in Xcode 14+)
+include_bitcode(false)
+
+# Include symbols for crash reporting
+include_symbols(true)
+
+# Export xcargs
+export_xcargs("-allowProvisioningUpdates")
+
+# Suppress Xcode output
+suppress_xcode_output(false)
+
+# Disable automatic code signing
+codesigning_identity(nil)
+
+# Build for device (not simulator)
+sdk("iphoneos")
+
+# Derived data path
+derived_data_path("./DerivedData")
+
+# Archive path
+archive_path("./fastlane/builds/Deets.xcarchive")
+
+# Result bundle path for detailed build logs
+result_bundle(true)
+
+# Export options
+export_options({
+  method: "app-store",
+  provisioningProfiles: {
+    "com.deets.app" => "match AppStore com.deets.app"
+  },
+  signingStyle: "manual",
+  uploadBitcode: false,
+  uploadSymbols: true,
+  compileBitcode: false,
+  manageAppVersionAndBuildNumber: false
+})

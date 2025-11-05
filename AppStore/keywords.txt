@@ -1,0 +1,458 @@
+# Deets - App Store Keyword Research (ASO)
+
+Version: 1.0.0
+Last Updated: 2025-11-05
+Owner: LUMEN (Brand & App Store Assets Lead)
+
+---
+
+## PRIMARY KEYWORD FIELD (100 characters max)
+
+FINAL KEYWORD STRING (81 characters):
+business card,scanner,contact,networking,OCR,vcard,export,offline,private,cards
+
+---
+
+## KEYWORD STRATEGY
+
+### Tier 1: High Volume, High Relevance (Already in App Name)
+- "business card" → IN APP NAME
+- "scanner" → IN APP NAME
+
+### Tier 2: Medium Volume, High Intent (Use in Keyword Field)
+✅ business card (covered in app name, but boost)
+✅ scanner (covered in app name, but boost)
+✅ contact (broad, high search volume)
+✅ networking (intent match)
+✅ OCR (technical users)
+✅ vcard (technical, high intent)
+✅ export (feature keyword)
+✅ offline (differentiator)
+✅ private (differentiator)
+✅ cards (broad catch-all)
+
+### Tier 3: Long-Tail Keywords (Use in Description)
+- business card reader
+- business card organizer
+- scan business cards
+- contact manager
+- card reader
+- card organizer
+- business contacts
+- contact export
+- scan cards
+- card scanner app
+
+### Tier 4: Niche/Privacy Keywords (Description only)
+- privacy-first
+- on-device processing
+- no cloud
+- local storage
+- secure scanner
+- encrypted contacts
+
+---
+
+## KEYWORD RESEARCH DATA
+
+### Search Volume Estimates (iOS App Store)
+
+HIGH VOLUME (10K+ monthly searches):
+- business card: ~50K
+- scanner: ~200K (broad)
+- contact: ~100K (broad)
+- contacts: ~80K
+
+MEDIUM VOLUME (1K-10K monthly searches):
+- business card scanner: ~8K
+- card scanner: ~6K
+- business cards: ~5K
+- contact manager: ~4K
+- business card reader: ~3K
+- networking: ~3K
+- scan business card: ~2K
+
+LOW VOLUME (100-1K monthly searches):
+- business card organizer: ~800
+- vcard: ~600
+- card reader: ~500
+- OCR scanner: ~400
+- offline scanner: ~300
+- private scanner: ~200
+- business card OCR: ~150
+
+---
+
+## COMPETITOR KEYWORD ANALYSIS
+
+### CamCard (Top Competitor)
+Their Keywords:
+- business card, scanner, card, QR, reader, cam, exchange, holder, wallet, organizer
+
+Gaps We Can Target:
+- privacy, offline, private, local, secure, no-cloud, on-device
+
+### ScanBizCards
+Their Keywords:
+- business, card, scan, contacts, reader, organizer, export, CRM, lead, sales
+
+Gaps We Can Target:
+- offline, private, simple, no-account, no-subscription
+
+### Haystack (Social Focus)
+Their Keywords:
+- business, card, digital, share, profile, social, network, link, QR, exchange
+
+Gaps We Can Target:
+- privacy, offline, export, traditional, physical, scan
+
+---
+
+## KEYWORD OPTIMIZATION BREAKDOWN
+
+### App Name (30 chars)
+"Deets - Business Card Scanner"
+
+Keywords captured:
+✅ Deets (brand)
+✅ Business Card (2 keywords)
+✅ Scanner (1 keyword)
+
+Total: 3 primary keywords in 29 characters
+
+### Subtitle (30 chars)
+"Meet once. Remember always."
+
+Keywords captured:
+❌ None (brand messaging, not ASO-optimized)
+
+Alternative (ASO-optimized):
+"Private, offline card scanner" → Would add: private, offline
+(Trade-off: Brand messaging vs ASO. Current choice prioritizes brand.)
+
+### Keyword Field (100 chars)
+"business card,scanner,contact,networking,OCR,vcard,export,offline,private,cards"
+
+Keywords captured:
+✅ business card (boost from app name)
+✅ scanner (boost from app name)
+✅ contact (new)
+✅ networking (new)
+✅ OCR (new)
+✅ vcard (new)
+✅ export (new)
+✅ offline (new, differentiator)
+✅ private (new, differentiator)
+✅ cards (new, broad)
+
+Total: 10 keywords in 81 characters
+
+---
+
+## KEYWORD PLACEMENT IN DESCRIPTION
+
+### Primary Keywords (Repeat 2-4 times naturally)
+- "business card" → 3 mentions
+- "scanner" → 3 mentions
+- "contact" / "contacts" → 8 mentions
+- "export" → 5 mentions
+- "scan" / "scanning" → 7 mentions
+
+### Secondary Keywords (Repeat 1-2 times)
+- "private" / "privacy" → 6 mentions
+- "offline" → 3 mentions
+- "VCF" / "vcard" → 2 mentions
+- "OCR" → 1 mention (technical users)
+- "networking" → 1 mention
+
+### Long-Tail Phrases (Natural usage)
+- "business card scanner" → 2 mentions
+- "contact manager" → 1 mention
+- "contact information" → 2 mentions
+- "business cards" → 3 mentions
+
+---
+
+## KEYWORD VARIATIONS TO AVOID
+
+DON'T USE (Violates Apple Guidelines):
+❌ "best business card scanner" (superlative claim)
+❌ "free scanner" (price keyword, misleading)
+❌ "#1 card scanner" (ranking claim)
+❌ "iPhone scanner" (device name not allowed)
+❌ "iOS scanner" (platform name not allowed)
+❌ "app" (redundant in App Store)
+
+DON'T USE (Low relevance / off-topic):
+❌ "CRM" (enterprise focus, not our market)
+❌ "social" (we're not a social app)
+❌ "digital business card" (we scan physical cards)
+❌ "QR code" (not a primary feature)
+❌ "lead generation" (sales focus, not our angle)
+
+---
+
+## MULTI-LANGUAGE KEYWORDS (Future)
+
+### Spanish (Spain & Latin America)
+- tarjeta de visita
+- escáner
+- contactos
+- tarjetas
+- negocios
+
+### French (France & Canada)
+- carte de visite
+- scanner
+- contacts
+- privé
+- hors ligne
+
+### German
+- visitenkarte
+- scanner
+- kontakte
+- privat
+- offline
+
+### Japanese
+- 名刺 (meishi - business card)
+- スキャナー (scanner)
+- 連絡先 (contact)
+- オフライン (offline)
+- プライバシー (privacy)
+
+### Chinese (Simplified)
+- 名片 (business card)
+- 扫描 (scan)
+- 联系人 (contact)
+- 离线 (offline)
+- 隐私 (privacy)
+
+---
+
+## A/B TESTING PLAN
+
+### Test 1: Privacy Focus vs Feature Focus
+
+**Current (Privacy)**:
+business card,scanner,contact,networking,OCR,vcard,export,offline,private,cards
+
+**Alternative (Feature)**:
+business card,scanner,contact,reader,organizer,export,vcard,OCR,manager,wallet
+
+Hypothesis: Privacy keywords attract quality users; feature keywords drive volume
+Test Duration: 90 days
+Measure: Downloads, conversion rate, retention
+
+### Test 2: Technical vs Consumer Keywords
+
+**Current (Mixed)**:
+business card,scanner,contact,networking,OCR,vcard,export,offline,private,cards
+
+**Alternative (Consumer)**:
+business card,scanner,contact,networking,reader,organizer,cards,keeper,holder,manager
+
+Hypothesis: Consumer terms (reader, organizer) have higher volume than technical terms (OCR, vcard)
+Test Duration: 90 days
+Measure: Impressions, keyword ranking
+
+---
+
+## KEYWORD RANKING GOALS (90 Days)
+
+### Top 10 Rankings (Aggressive Goal)
+- business card scanner
+- offline business card scanner
+- private card scanner
+
+### Top 20 Rankings (Achievable Goal)
+- business card
+- card scanner
+- business card reader
+- contact scanner
+- vcard export
+
+### Top 50 Rankings (Baseline Goal)
+- scanner
+- contact manager
+- business cards
+- OCR scanner
+- networking app
+
+---
+
+## SEASONAL KEYWORD OPPORTUNITIES
+
+### Conference Season (Feb-May, Sep-Oct)
+Boost keywords:
+- networking
+- conference
+- trade show
+- event
+
+Add to promotional text during these months.
+
+### Year-End Networking (Nov-Dec)
+Boost keywords:
+- networking
+- business contacts
+- professional
+
+Update What's New to mention holiday networking events.
+
+---
+
+## NEGATIVE KEYWORDS (Monitor & Avoid)
+
+### Low-Quality Traffic Keywords
+- free (we're paid)
+- game (wrong category)
+- photo (too broad)
+- social (not our focus)
+- dating (completely wrong)
+
+### Competitor Brand Names (Don't Include)
+- CamCard
+- ScanBizCards
+- Haystack
+- Evernote
+- HubSpot
+
+Apple prohibits using competitor brand names in keywords.
+
+---
+
+## KEYWORD PERFORMANCE TRACKING
+
+### Metrics to Monitor (App Store Connect Analytics)
+
+1. **Impressions by Keyword**
+   - Which keywords are showing our app?
+   - Are target keywords generating impressions?
+
+2. **Conversion Rate by Keyword**
+   - Which keywords lead to downloads?
+   - Are privacy keywords converting better?
+
+3. **Keyword Ranking**
+   - Position for each target keyword
+   - Movement over time (trending up/down)
+
+4. **Search Traffic %**
+   - What % of downloads come from search?
+   - Goal: 40%+ from organic search
+
+### Monthly Review Checklist
+- [ ] Check keyword rankings in App Store Connect
+- [ ] Review conversion rates by keyword
+- [ ] Identify new competitor keywords
+- [ ] Test keyword variations (if applicable)
+- [ ] Update description if needed (no app update required)
+
+---
+
+## KEYWORD OPTIMIZATION TIMELINE
+
+### Month 1-3 (Initial Launch)
+- Focus: Core keywords (business card, scanner)
+- Goal: Establish baseline rankings
+- Action: No changes, collect data
+
+### Month 4-6 (First Optimization)
+- Focus: Analyze performance data
+- Goal: Improve underperforming keywords
+- Action: A/B test keyword variations
+
+### Month 7-12 (Ongoing Refinement)
+- Focus: Long-tail keyword expansion
+- Goal: Capture niche searches (privacy, offline)
+- Action: Update description for seasonal keywords
+
+---
+
+## KEYWORD COMPETITOR TRACKING
+
+### Tools to Use
+- App Store Connect Analytics (official data)
+- Sensor Tower (keyword tracking, paid)
+- App Annie (market intelligence, paid)
+- Manual searches (free)
+
+### Competitors to Monitor
+1. CamCard (main competitor)
+2. ScanBizCards (enterprise focus)
+3. Business Card Reader (generic)
+4. Haystack (social angle)
+5. Microsoft Lens (big tech competitor)
+
+### Monitoring Schedule
+- Weekly: Manual App Store searches for top 5 keywords
+- Monthly: Full keyword ranking report
+- Quarterly: Competitor keyword analysis
+
+---
+
+## FINAL KEYWORD RECOMMENDATIONS
+
+### Current Keyword String (81 chars)
+business card,scanner,contact,networking,OCR,vcard,export,offline,private,cards
+
+### Alternative Options (If Testing)
+
+**Option A: Privacy Focus (85 chars)**
+business card,scanner,contact,private,offline,secure,local,export,vcard,OCR,networking
+
+**Option B: Feature Focus (89 chars)**
+business card,scanner,contact,reader,organizer,manager,export,vcard,OCR,networking,keeper
+
+**Option C: Maximum Coverage (100 chars)**
+business card,scanner,contact,reader,organizer,export,vcard,OCR,offline,private,networking,cards
+
+### Recommendation
+Stick with CURRENT string for 90 days, then A/B test based on data.
+
+Rationale:
+- Balances volume (business card, scanner, contact)
+- Includes differentiators (offline, private)
+- Covers technical users (OCR, vcard)
+- Leaves room for future expansion (19 chars unused)
+
+---
+
+## REVIEW KEYWORD STRATEGY
+
+### Encourage Reviews Mentioning
+- "privacy" / "private"
+- "offline"
+- "simple" / "easy"
+- "no subscription"
+- "works great"
+
+These organic review keywords boost ASO without explicit keyword stuffing.
+
+### Respond to Reviews With
+- Thank users by name
+- Echo keywords naturally ("glad you appreciate the privacy focus")
+- Encourage sharing ("tell your colleagues who value privacy")
+
+---
+
+## NOTES
+
+- Keyword field updates do NOT require app submission (can change anytime)
+- App name/subtitle changes DO require app submission (use carefully)
+- Description updates do NOT require app submission (update freely)
+- Review keyword density before publishing (avoid keyword stuffing)
+- Focus on natural language, not just ASO (users read descriptions too)
+
+---
+
+## CONTACT
+
+For ASO strategy questions:
+Email: marketing@deets.app
+Owner: LUMEN (Brand & App Store Assets Lead)
+
+Last Updated: 2025-11-05
+Version: 1.0.0

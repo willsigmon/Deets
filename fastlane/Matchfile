@@ -1,0 +1,68 @@
+# Fastlane Matchfile - Code Signing Configuration
+# Documentation: https://docs.fastlane.tools/actions/match/
+
+# Git repository URL for storing certificates and profiles
+# Example: "https://github.com/yourcompany/certificates"
+git_url(ENV["MATCH_GIT_URL"] || "")
+
+# Git branch to use (default: master)
+git_branch("main")
+
+# Storage mode (git, google_cloud, s3, gitlab_secure_files)
+storage_mode("git")
+
+# App identifier
+app_identifier(["com.deets.app"])
+
+# Your Apple Developer Portal username
+username(ENV["FASTLANE_APPLE_ID"] || "")
+
+# Team ID from Apple Developer Portal
+team_id(ENV["FASTLANE_TEAM_ID"] || "")
+
+# Type of provisioning profile (appstore, adhoc, development, enterprise)
+type("appstore")
+
+# Force renew certificates even if they're not expired
+force(false)
+
+# Renew certificates if they're expiring within 30 days
+force_for_new_devices(false)
+
+# Skip checking Apple Developer Portal for devices
+skip_provisioning_profiles(false)
+
+# Readonly mode - don't create new certificates (useful for CI)
+readonly(false)
+
+# Generate Apple Silicon and Intel certificates
+generate_apple_certs(true)
+
+# Clone full git history (recommended for debugging)
+shallow_clone(false)
+
+# Skip confirmation prompts (useful for CI)
+skip_confirmation(false)
+
+# Keychain name to install certificates
+keychain_name("login.keychain")
+
+# Keychain password
+keychain_password(ENV["MATCH_KEYCHAIN_PASSWORD"] || "")
+
+# Verbose output
+verbose(false)
+
+# Platform (ios, macos, tvos)
+platform("ios")
+
+# Additional cert types to sync
+# Uncomment if you need development certs too
+# additional_cert_types(["developer_id_application"])
+
+# Template name for provisioning profile
+# Use custom template if you have specific entitlements
+# template_name("")
+
+# Output path for downloaded profiles
+# output_path("./fastlane/certificates")

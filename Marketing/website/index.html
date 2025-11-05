@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Deets - The privacy-first business card scanner for iOS. Scan, save, and never lose a connection. Local-only storage, no cloud required.">
+    <meta name="keywords" content="business card scanner, iOS app, contact management, OCR, privacy-first, local storage">
+    <meta property="og:title" content="Deets - Meet once. Remember always.">
+    <meta property="og:description" content="The privacy-first business card scanner for iOS. Scan, save, and organize contacts in seconds.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="./assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Deets - Meet once. Remember always.</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #23C4AE;
+            --primary-dark: #1BA896;
+            --text-dark: #1A1A1A;
+            --text-light: #666;
+            --bg-light: #F8F9FA;
+            --white: #FFFFFF;
+            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .cta-button {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(35,196,174,0.3);
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(35,196,174,0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 150px 0 100px;
+            text-align: center;
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8F5F3 100%);
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .tagline {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+
+        .app-store-badge {
+            height: 50px;
+        }
+
+        .hero-image {
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: var(--shadow-lg);
+            border-radius: 20px;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            padding: 40px;
+            background: var(--bg-light);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 30px;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        /* Privacy Section */
+        .privacy {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, #1BA896 100%);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .privacy h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        .privacy p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.95;
+        }
+
+        .privacy-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .privacy-feature {
+            padding: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .privacy-feature h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Download Section */
+        .download {
+            padding: 100px 0;
+            background: var(--bg-light);
+            text-align: center;
+        }
+
+        .download h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        .download p {
+            font-size: 20px;
+            color: var(--text-light);
+            margin-bottom: 40px;
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 100px 0;
+            background: var(--white);
+        }
+
+        .faq-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 30px;
+            padding: 30px;
+            background: var(--bg-light);
+            border-radius: 12px;
+        }
+
+        .faq-item h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .faq-item p {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0 30px;
+            background: var(--text-dark);
+            color: var(--white);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .tagline {
+                font-size: 22px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .section-header h2 {
+                font-size: 32px;
+            }
+
+            .features-grid,
+            .privacy-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">Deets</div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#privacy">Privacy</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+            <a href="#download" class="cta-button">Download</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Never Lose a Connection</h1>
+            <p class="tagline">Meet once. Remember always.</p>
+            <p>The privacy-first business card scanner for iOS. Scan, save, and organize contacts in seconds. Everything stays on your device.</p>
+
+            <div class="hero-buttons">
+                <a href="#download" class="cta-button">Download for iOS</a>
+                <a href="#features" style="background: transparent; border: 2px solid var(--primary); color: var(--primary);" class="cta-button">Learn More</a>
+            </div>
+
+            <!-- Placeholder for hero image/mockup -->
+            <div style="margin-top: 60px; padding: 40px; background: rgba(255,255,255,0.5); border-radius: 20px; border: 2px dashed var(--primary);">
+                <p style="color: var(--text-light);">Hero Image: iPhone mockup showing app interface</p>
+                <p style="font-size: 14px; color: var(--text-light); margin-top: 10px;">(Add screenshot or 3D mockup here)</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Deets?</h2>
+                <p>Everything you need to manage business cards, nothing you don't.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3>Instant Scanning</h3>
+                    <p>Point your camera at any business card and watch the magic happen. Advanced OCR extracts names, emails, phone numbers, and more in seconds.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>100% Private</h3>
+                    <p>Everything stays on your device. No cloud. No tracking. No servers. Your contacts are yours, period.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Native iOS</h3>
+                    <p>Built with SwiftUI for a fast, beautiful, and familiar iOS experience. Integrates seamlessly with your Contacts app.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✏️</div>
+                    <h3>Smart Editing</h3>
+                    <p>Review and correct scanned information before saving. Add notes, favorite important contacts, and customize fields.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Powerful Search</h3>
+                    <p>Find anyone instantly with smart search and filters. Sort by name, company, date added, or favorites.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📤</div>
+                    <h3>Easy Sharing</h3>
+                    <p>Save to iOS Contacts with one tap. Export as vCard or share via any app. Your data, your way.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Privacy Section -->
+    <section class="privacy" id="privacy">
+        <div class="container">
+            <h2>Your Privacy Matters</h2>
+            <p>We built Deets from the ground up with privacy as the foundation. No compromises, no exceptions.</p>
+
+            <div class="privacy-features">
+                <div class="privacy-feature">
+                    <h4>Local Storage Only</h4>
+                    <p>All your contacts stay on your iPhone. Never synced to any server.</p>
+                </div>
+
+                <div class="privacy-feature">
+                    <h4>No Account Required</h4>
+                    <p>Download and start scanning. No email, no sign-up, no hassle.</p>
+                </div>
+
+                <div class="privacy-feature">
+                    <h4>Zero Tracking</h4>
+                    <p>We don't track what you scan, who you meet, or how you use the app.</p>
+                </div>
+
+                <div class="privacy-feature">
+                    <h4>Open Source Ready</h4>
+                    <p>Transparent code. You can verify every privacy claim we make.</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 40px; font-size: 16px; opacity: 0.9;">Read our <a href="privacy-policy.html" style="color: white; text-decoration: underline;">Privacy Policy</a></p>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download" id="download">
+        <div class="container">
+            <h2>Ready to Get Started?</h2>
+            <p>Download Deets for free on iOS. No subscription, no in-app purchases, no nonsense.</p>
+
+            <!-- Placeholder for App Store badge -->
+            <a href="https://apps.apple.com/app/deets" style="display: inline-block; margin-top: 20px;">
+                <img src="./assets/app-store-badge.svg" alt="Download on App Store" class="app-store-badge">
+            </a>
+
+            <p style="margin-top: 30px; color: var(--text-light); font-size: 16px;">
+                Requires iOS 16.0 or later. Compatible with iPhone and iPad.
+            </p>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <h3>Is Deets really free?</h3>
+                    <p>Yes. No subscription, no in-app purchases, no hidden costs. We built Deets to solve a problem we had, and we want everyone to benefit.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>How accurate is the scanning?</h3>
+                    <p>Deets uses Apple's VisionKit framework, the same technology that powers text recognition across iOS. It's incredibly accurate with clear business cards. You can always review and edit before saving.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Can I sync contacts across devices?</h3>
+                    <p>Currently, all contacts are stored locally on your device for maximum privacy. We're exploring optional iCloud sync for future versions while maintaining our privacy-first approach.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>What happens to my data?</h3>
+                    <p>It stays on your device. Period. We don't have servers, we don't collect analytics, and we can't access your contacts even if we wanted to.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Can I export my contacts?</h3>
+                    <p>Absolutely. Save individual contacts to your iOS Contacts app, or export as vCard files to use anywhere. Your data is never locked in.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>What languages are supported?</h3>
+                    <p>Deets currently supports English, with more languages coming soon. The OCR works with business cards in any language that uses Latin characters.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>How do I get support?</h3>
+                    <p>Email us at support@deetsapp.com or tweet @DeetsApp. We read every message and typically respond within 24 hours.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#download">Download</a></li>
+                        <li><a href="press-kit.html">Press Kit</a></li>
+                        <li><a href="roadmap.html">Roadmap</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="licenses.html">Open Source Licenses</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://twitter.com/DeetsApp">Twitter</a></li>
+                        <li><a href="https://linkedin.com/company/deets">LinkedIn</a></li>
+                        <li><a href="https://github.com/deets">GitHub</a></li>
+                        <li><a href="mailto:hello@deetsapp.com">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 Deets. All rights reserved. Made with care for your privacy.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

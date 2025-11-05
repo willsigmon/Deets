@@ -1,0 +1,439 @@
+# Deets - Agent Coordination Context
+# This file provides shared mission context for AI agents working on the project
+
+project:
+  name: "Deets"
+  tagline: "Privacy-first business card scanner for iOS"
+  version: "1.0.0"
+  minimum_ios: "17.0"
+  minimum_xcode: "15.4"
+  swift_version: "5.10"
+
+mission:
+  primary: "Build a native iOS business card scanning app that respects user privacy and works offline"
+
+  core_principles:
+    - "Privacy First: All processing happens on-device, no cloud by default"
+    - "Offline First: Full functionality without internet connection"
+    - "Native Performance: SwiftUI + SwiftData for modern iOS experience"
+    - "Data Ownership: User controls all exports and integrations"
+    - "Zero Tracking: No analytics, no telemetry, no third-party SDKs"
+
+architecture:
+  pattern: "MVVM (Model-View-ViewModel)"
+  ui_framework: "SwiftUI"
+  persistence: "SwiftData"
+  ocr: "VisionKit"
+  export: "Contacts framework"
+
+  layers:
+    - name: "Views"
+      responsibility: "SwiftUI views, user interaction, display"
+      location: "Views/"
+
+    - name: "ViewModels"
+      responsibility: "Business logic, state management, service coordination"
+      location: "ViewModels/"
+
+    - name: "Services"
+      responsibility: "Complex operations, framework integration, clean APIs"
+      location: "Services/"
+      sublayers:
+        - OCRService: "VisionKit text recognition and parsing"
+        - DatabaseService: "SwiftData CRUD operations"
+        - PhotoService: "Image storage and optimization"
+        - ExportService: "Export to Contacts, VCF, CSV"
+
+    - name: "Models"
+      responsibility: "SwiftData models, data structures"
+      location: "Models/"
+
+technology_stack:
+  frameworks:
+    - name: "SwiftUI"
+      purpose: "UI framework"
+      version: "iOS 17+"
+
+    - name: "SwiftData"
+      purpose: "Persistence layer"
+      version: "iOS 17+"
+
+    - name: "VisionKit"
+      purpose: "Document scanning + OCR"
+      version: "iOS 13+"
+
+    - name: "Contacts"
+      purpose: "Export to Apple Contacts"
+      version: "iOS 9+"
+
+    - name: "PhotoKit"
+      purpose: "Photo library integration"
+      version: "iOS 8+"
+
+    - name: "Combine"
+      purpose: "Reactive streams (where needed)"
+      version: "iOS 13+"
+
+  third_party_dependencies:
+    production: []  # Zero third-party deps in production
+    development:
+      - "SwiftLint (code quality, optional)"
+      - "SnapshotTesting (UI tests, optional)"
+
+data_flow:
+  pipeline:
+    - stage: "Capture"
+      input: "User taps 'Scan Card'"
+      process: "VNDocumentCameraViewController captures image"
+      output: "UIImage (cropped, perspective-corrected)"
+
+    - stage: "Preprocessing"
+      input: "Raw UIImage"
+      process: "PhotoService optimizes and stores image"
+      output: "photoPath (String) + thumbnail"
+
+    - stage: "OCR"
+      input: "UIImage"
+      process: "VisionKit text recognition + smart parsing"
+      output: "RecognizedText with confidence scores"
+
+    - stage: "Parsing"
+      input: "RecognizedText"
+      process: "Extract email, phone, name, company via RegEx + heuristics"
+      output: "BusinessCard (parsed fields)"
+
+    - stage: "Validation"
+      input: "BusinessCard (parsed)"
+      process: "User reviews and edits in ContactEditView"
+      output: "BusinessCard (validated)"
+
+    - stage: "Persistence"
+      input: "BusinessCard (validated)"
+      process: "DatabaseService saves to SwiftData"
+      output: "BusinessCard (with persistent ID)"
+
+    - stage: "Export"
+      input: "Selected BusinessCards"
+      process: "ExportService converts to CNContact/VCF/CSV"
+      output: "Exported contacts in chosen format"
+
+permissions:
+  required:
+    - name: "Camera"
+      key: "NSCameraUsageDescription"
+      description: "Scan business cards using your camera"
+      when: "User taps 'Scan Card'"
+
+    - name: "Contacts"
+      key: "NSContactsUsageDescription"
+      description: "Export business cards to your Contacts"
+      when: "User taps 'Export to Contacts'"
+
+    - name: "Photo Library (Add)"
+      key: "NSPhotoLibraryAddUsageDescription"
+      description: "Save business card images to Photos"
+      when: "User chooses to save photo to library"
+
+folder_structure:
+  root:
+    - App/:
+        - DeetsApp.swift: "App entry point, SwiftUI @main"
+        - ContentView.swift: "Root navigation container"
+
+    - Views/:
+        - Scanning/:
+            - ScannerView.swift: "VisionKit scanner interface"
+            - PreviewView.swift: "Scanned image preview"
+            - CropView.swift: "Manual crop/adjust"
+        - Contacts/:
+            - ContactListView.swift: "Main contact list"
+            - ContactDetailView.swift: "Individual contact details"
+            - ContactEditView.swift: "Edit parsed data"
+        - Settings/:
+            - SettingsView.swift: "App preferences"
+            - PrivacyView.swift: "Privacy controls"
+            - ExportOptionsView.swift: "Export configurations"
+        - Shared/:
+            - LoadingView.swift: "Reusable loading states"
+            - ErrorView.swift: "Error presentation"
+            - EmptyStateView.swift: "Empty list states"
+
+    - ViewModels/:
+        - ScannerViewModel.swift: "Scanning flow orchestration"
+        - ContactListViewModel.swift: "List operations"
+        - ContactDetailViewModel.swift: "Single contact operations"
+        - SettingsViewModel.swift: "App configuration"
+
+    - Services/:
+        - OCR/:
+            - OCRService.swift: "VisionKit integration"
+            - OCRParser.swift: "Business card parsing logic"
+        - Database/:
+            - DatabaseService.swift: "SwiftData operations"
+        - Photo/:
+            - PhotoService.swift: "Image storage"
+        - Export/:
+            - ExportService.swift: "Export implementations"
+
+    - Models/:
+        - BusinessCard.swift: "SwiftData model for contact"
+        - RecognizedText.swift: "OCR result structure"
+        - AppError.swift: "Typed error definitions"
+
+    - Resources/:
+        - Assets.xcassets: "App icons, images"
+        - Localizable.xcstrings: "Localized strings"
+        - Info.plist: "App configuration"
+
+    - Docs/:
+        - architecture.md: "Architecture documentation"
+        - pipeline.md: "Data flow pipeline details"
+        - privacy-policy.md: "Privacy policy (App Store requirement)"
+
+    - Tests/:
+        - Unit/: "Unit tests for ViewModels, Services, Models"
+        - UI/: "UI tests for user flows"
+        - Integration/: "Integration tests for pipelines"
+
+    - Privacy/:
+        - privacy-policy.md: "User-facing privacy policy"
+        - data-handling.md: "Internal data handling guide"
+
+    - Brand/:
+        - app-icon.png: "App icon source files"
+        - screenshots/: "App Store screenshots"
+        - marketing/: "Marketing assets"
+
+    - Config/:
+        - FeatureFlags.swift: "Feature toggles"
+        - Constants.swift: "App-wide constants"
+
+coding_standards:
+  swift:
+    - "Use Swift 5.10+ features (strict concurrency)"
+    - "Async/await for all asynchronous operations"
+    - "Protocol-oriented design for services"
+    - "Dependency injection for testability"
+    - "No force-unwraps in production code (use guard/if let)"
+    - "Use @MainActor for UI-bound ViewModels"
+    - "SwiftUI property wrappers: @StateObject for ownership, @ObservedObject for passed objects"
+
+  architecture:
+    - "MVVM pattern: Views are dumb, ViewModels contain logic"
+    - "Services have protocol definitions (for mocking)"
+    - "Clear layer boundaries: View → ViewModel → Service → Framework"
+    - "No business logic in Views"
+    - "No UI code in Services"
+
+  testing:
+    - "Unit test coverage: ViewModels 90%+, Services 85%+, Models 80%+"
+    - "UI tests for critical user flows"
+    - "Integration tests for pipelines"
+    - "Mock services for ViewModel tests"
+
+  privacy:
+    - "No hardcoded API keys or secrets"
+    - "No third-party analytics or tracking"
+    - "Request permissions just-in-time (when feature is used)"
+    - "Explicit user consent for iCloud sync"
+    - "Secure deletion (overwrite files)"
+
+agent_roles:
+  - role: "ORION"
+    title: "Chief Architect"
+    responsibilities:
+      - "Define system architecture"
+      - "Create folder structure"
+      - "Write technical documentation"
+      - "Establish coding standards"
+
+  - role: "UI Builder"
+    title: "SwiftUI Specialist"
+    responsibilities:
+      - "Implement SwiftUI views"
+      - "Design system components"
+      - "Accessibility implementation"
+      - "UI testing"
+
+  - role: "Business Logic Engineer"
+    title: "ViewModel & Service Developer"
+    responsibilities:
+      - "Implement ViewModels"
+      - "Build Services layer"
+      - "Business logic validation"
+      - "Unit testing"
+
+  - role: "Data Engineer"
+    title: "SwiftData & Persistence Specialist"
+    responsibilities:
+      - "SwiftData models"
+      - "Database migrations"
+      - "iCloud sync configuration"
+      - "Data integrity"
+
+  - role: "OCR Specialist"
+    title: "VisionKit & Parsing Expert"
+    responsibilities:
+      - "VisionKit integration"
+      - "Business card parsing algorithms"
+      - "OCR accuracy optimization"
+      - "Multi-language support"
+
+  - role: "QA Engineer"
+    title: "Testing & Quality Assurance"
+    responsibilities:
+      - "Write unit tests"
+      - "Write UI tests"
+      - "Performance testing"
+      - "Bug verification"
+
+  - role: "Privacy Officer"
+    title: "Privacy & Security Guardian"
+    responsibilities:
+      - "Privacy policy documentation"
+      - "Permission flow validation"
+      - "Security audit"
+      - "App Store compliance"
+
+workflows:
+  feature_development:
+    - step: 1
+      action: "Create feature branch"
+      command: "git checkout -b feature/scanner-ui"
+
+    - step: 2
+      action: "Define protocols (Services)"
+      example: "protocol OCRServiceProtocol { ... }"
+
+    - step: 3
+      action: "Implement service"
+      tests: "Write unit tests first (TDD)"
+
+    - step: 4
+      action: "Create ViewModel"
+      pattern: "@MainActor, ObservableObject, injected services"
+
+    - step: 5
+      action: "Build SwiftUI View"
+      pattern: "@StateObject for ViewModel, accessibility labels"
+
+    - step: 6
+      action: "Write UI tests"
+      focus: "Critical user flows"
+
+    - step: 7
+      action: "Code review"
+      checklist: "See Docs/code-review-checklist.md"
+
+    - step: 8
+      action: "Merge to develop"
+      command: "git merge --no-ff feature/scanner-ui"
+
+  testing:
+    - "Run unit tests: swift test"
+    - "Run UI tests: xcodebuild test -scheme Deets -destination 'platform=iOS Simulator,name=iPhone 15'"
+    - "Generate coverage: xcodebuild test -enableCodeCoverage YES"
+    - "SwiftLint: swiftlint lint --strict"
+
+  deployment:
+    - "TestFlight: Archive → Upload → External Testing"
+    - "App Store: Submit for review → Release"
+
+key_files:
+  - path: "Docs/architecture.md"
+    purpose: "Complete architecture documentation"
+
+  - path: "Docs/pipeline.md"
+    purpose: "Data flow pipeline details"
+
+  - path: "Package.swift"
+    purpose: "Swift Package Manager manifest"
+
+  - path: "system/context.yaml"
+    purpose: "Agent coordination (this file)"
+
+  - path: "App/DeetsApp.swift"
+    purpose: "SwiftUI app entry point"
+
+  - path: "Models/BusinessCard.swift"
+    purpose: "Core data model"
+
+notes_for_agents:
+  - "All services must have protocol definitions for testability"
+  - "Use dependency injection: ViewModels receive services via init()"
+  - "No singletons except for truly global state (PermissionManager)"
+  - "SwiftUI previews for all views (with mock data)"
+  - "Accessibility first: labels, dynamic type, VoiceOver"
+  - "Privacy first: no cloud unless user opts in"
+  - "Error handling: typed errors, user-friendly messages"
+  - "Performance: 60fps UI, <5s OCR, lazy loading"
+  - "Documentation: inline docs for all public APIs"
+  - "Git commits: semantic messages (feat:, fix:, docs:, test:)"
+
+success_metrics:
+  - "Scan to save: <20s (typical case)"
+  - "OCR accuracy: >90% for standard business cards"
+  - "App size: <30MB"
+  - "Test coverage: >85% overall"
+  - "Zero crashes in production"
+  - "App Store rating: >4.5 stars"
+
+known_limitations_v1:
+  - "English only (multi-language in v1.1)"
+  - "Single card scanning (batch in v1.1)"
+  - "No QR code detection (v1.2)"
+  - "Basic duplicate detection (AI in v2.0)"
+  - "Manual parsing heuristics (ML in v2.0)"
+
+future_roadmap:
+  v1.1:
+    - "Batch scanning (multi-card import)"
+    - "Multi-language OCR support"
+    - "Advanced duplicate detection"
+
+  v1.2:
+    - "QR code detection and parsing"
+    - "Custom fields and tags"
+    - "Export to CRM systems"
+
+  v2.0:
+    - "CoreML-powered parsing"
+    - "LinkedIn profile auto-fill"
+    - "Android version (Kotlin + Jetpack Compose)"
+
+  v3.0:
+    - "Web app (React + TypeScript)"
+    - "Team collaboration features"
+    - "API for third-party integrations"
+
+---
+# Agent Commands
+
+# When starting work on this project:
+# 1. Read Docs/architecture.md (understand system design)
+# 2. Read Docs/pipeline.md (understand data flow)
+# 3. Check this file for your role and responsibilities
+# 4. Follow coding standards strictly
+# 5. Write tests before implementation (TDD)
+# 6. Ask questions if architecture is unclear
+
+# When implementing a feature:
+# 1. Define protocol first (if it's a Service)
+# 2. Write unit tests (TDD)
+# 3. Implement logic
+# 4. Create SwiftUI view
+# 5. Add accessibility labels
+# 6. Write UI test for critical flow
+# 7. Update documentation if needed
+
+# When encountering issues:
+# 1. Check Docs/ for guidance
+# 2. Review existing code patterns
+# 3. Consult architecture.md for design decisions
+# 4. Ask for clarification if needed
+
+---
+
+# Last Updated: 2025-11-05
+# Version: 1.0.0
+# Maintained by: ORION (Chief Architect)
