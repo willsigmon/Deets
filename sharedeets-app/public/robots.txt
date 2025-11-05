@@ -1,0 +1,6 @@
+# robots.txt for sharedeets.app
+
+User-agent: *
+Allow: /
+
+Sitemap: https://sharedeets.app/sitemap.xml
