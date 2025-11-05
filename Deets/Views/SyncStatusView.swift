@@ -17,21 +17,31 @@ struct SyncStatusView: View {
             List {
                 // MARK: - Sync Toggle Section
                 Section {
-                    Toggle(isOn: Binding(
-                        get: { viewModel.isSyncEnabled },
-                        set: { _ in viewModel.toggleSync() }
-                    )) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("iCloud Sync")
-                                .font(.headline)
-                            Text("Keep your business cards synced across devices")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                    HStack {
+                        Toggle(isOn: Binding(
+                            get: { viewModel.isSyncEnabled },
+                            set: { _ in viewModel.toggleSync() }
+                        )) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("iCloud Sync")
+                                    .font(.headline)
+                                Text("Keep your business cards synced across devices")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .disabled(!viewModel.isICloudAvailable || viewModel.isTogglingSync)
+
+                        if viewModel.isTogglingSync {
+                            ProgressView()
+                                .padding(.leading, 8)
                         }
                     }
-                    .disabled(!viewModel.isICloudAvailable)
                 } footer: {
-                    if !viewModel.isICloudAvailable {
+                    if viewModel.isTogglingSync {
+                        Text("Updating sync settings...")
+                            .foregroundStyle(.secondary)
+                    } else if !viewModel.isICloudAvailable {
                         Text("iCloud is not available. Please sign in to iCloud in Settings.")
                             .foregroundStyle(.red)
                     }

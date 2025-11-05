@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- MARK: - Tracking Declaration -->
+
+	<!-- Deets does NOT track users across apps/websites for advertising/analytics -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+
+	<!-- MARK: - Tracking Domains -->
+
+	<!-- No third-party tracking domains used -->
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!-- MARK: - Data Collection Types -->
+
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array>
+		<!-- Contact Information -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeContactInfo</string>
+
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+
+		<!-- Photos -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypePhotosorVideos</string>
+
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- MARK: - Privacy-Sensitive APIs Used -->
+
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<!-- UserDefaults API -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- CA92.1: User-configurable app settings and preferences -->
+				<string>CA92.1</string>
+			</array>
+		</dict>
+
+		<!-- File Timestamp API -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- C617.1: Accessing timestamps to display to user -->
+				<string>C617.1</string>
+				<!-- 0A2A.1: Accessing creation dates for photo sorting -->
+				<string>0A2A.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

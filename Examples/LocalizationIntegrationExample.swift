@@ -16,7 +16,7 @@ struct ScanView_Localized: View {
             VStack(spacing: 32) {
                 // Icon
                 Image(systemName: "camera.viewfinder")
-                    .font(.system(size: 80))
+                    .iconXLarge()
                     .foregroundStyle(Color.teal)
                     .accessibilityHidden(true)
 

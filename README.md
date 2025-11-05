@@ -22,6 +22,20 @@ A modern iOS app for scanning, managing, and exporting business cards using Visi
 - **Contacts Framework**: iOS Contacts integration
 - **Observation Framework**: Modern state management with @Observable
 
+## Documentation
+
+📚 **New to Deets?** Start here:
+
+- **[GETTING_STARTED.md](GETTING_STARTED.md)** - Quick setup guide (5 minutes to your first scan)
+- **[USER_GUIDE.md](USER_GUIDE.md)** - Complete user manual with features, tips, and FAQ
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Solutions to common problems
+
+📖 **Additional Documentation:**
+
+- **[Documentation/Export-Feature-Guide.md](Documentation/Export-Feature-Guide.md)** - Export formats and usage
+- **[ERROR_HANDLING_REPORT.md](ERROR_HANDLING_REPORT.md)** - Error handling technical details
+- **[Privacy/privacy-policy.md](Privacy/privacy-policy.md)** - Privacy policy and data handling
+
 ## Requirements
 
 - iOS 16.0+

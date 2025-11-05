@@ -151,7 +151,14 @@ class ContactsService: ObservableObject {
         }
 
         // Convert to mutable
-        let mutableContact = existingContact.mutableCopy() as! CNMutableContact
+        guard let mutableContact = existingContact.mutableCopy() as? CNMutableContact else {
+            AppLogger.contacts.error("Failed to create mutable copy of existing contact")
+            throw ContactsError.updateFailed(underlying: NSError(
+                domain: "com.deets.contacts",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Unable to create mutable contact copy"]
+            ))
+        }
 
         // Merge new data
         let newContact = parsedContact.toCNMutableContact()
@@ -395,7 +402,15 @@ class ContactsService: ObservableObject {
             throw ContactsError.contactNotFound
         }
 
-        let mutableContact = contact.mutableCopy() as! CNMutableContact
+        guard let mutableContact = contact.mutableCopy() as? CNMutableContact else {
+            AppLogger.contacts.error("Failed to create mutable copy for deletion")
+            throw ContactsError.deleteFailed(underlying: NSError(
+                domain: "com.deets.contacts",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Unable to create mutable contact copy"]
+            ))
+        }
+
         let saveRequest = CNSaveRequest()
         saveRequest.delete(mutableContact)
 

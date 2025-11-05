@@ -184,7 +184,7 @@ struct PostScanFlowWithPhotoExample: View {
             // Photo enrichment prompt
             VStack(spacing: 12) {
                 Image(systemName: "photo.on.rectangle.angled")
-                    .font(.system(size: 50))
+                    .iconMedium()
                     .foregroundColor(.blue)
 
                 Text("Add a photo to this contact?")
@@ -292,7 +292,7 @@ struct BatchPhotoEnrichmentExample: View {
     private var completionView: some View {
         VStack(spacing: 20) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 60))
+                .iconMediumLarge()
                 .foregroundColor(.green)
 
             Text("Photos Added!")

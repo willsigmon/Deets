@@ -38,6 +38,18 @@ final class SyncViewModel: ObservableObject {
     /// Number of pending changes
     @Published var pendingChangesCount: Int = 0
 
+    /// Active sync conflicts (for manual resolution mode)
+    @Published var activeConflicts: [SyncConflict] = []
+
+    /// Whether to show conflict statistics
+    @Published var showConflictStats: Bool = false
+
+    /// Conflict statistics summary
+    @Published var conflictStatsSummary: String = "No conflicts detected"
+
+    /// Whether sync toggle is in progress (for activity indicator)
+    @Published var isTogglingSync: Bool = false
+
     // MARK: - Private Properties
 
     private let configuration = CloudKitConfiguration.shared
@@ -64,6 +76,8 @@ final class SyncViewModel: ObservableObject {
     }
 
     /// Toggle iCloud sync on/off
+    /// Note: The actual sync state change is handled by DeetsApp's onChange handler
+    /// This method just updates the configuration, which triggers the app's monitoring
     func toggleSync() {
         guard isICloudAvailable else {
             errorMessage = "iCloud is not available. Please sign in to iCloud in Settings."
@@ -71,16 +85,37 @@ final class SyncViewModel: ObservableObject {
             return
         }
 
-        if isSyncEnabled {
-            // Disable sync
-            syncService?.disableSync()
-            isSyncEnabled = false
-        } else {
-            // Enable sync
-            Task {
-                await syncService?.enableSync()
-                isSyncEnabled = true
+        guard !isTogglingSync else {
+            // Already toggling, ignore
+            return
+        }
+
+        let newSyncState = !isSyncEnabled
+
+        Task {
+            isTogglingSync = true
+
+            do {
+                // Update configuration (DeetsApp observes this change)
+                if newSyncState {
+                    configuration.enableSync()
+                } else {
+                    configuration.disableSync()
+                }
+
+                // Give monitoring a moment to start/stop
+                try await Task.sleep(for: .milliseconds(300))
+
+                // Update local state
+                isSyncEnabled = newSyncState
+                syncStatus = newSyncState ? .syncing : .notConfigured
+
+            } catch {
+                errorMessage = "Failed to toggle sync: \(error.localizedDescription)"
+                showErrorAlert = true
             }
+
+            isTogglingSync = false
         }
     }
 
@@ -112,6 +147,24 @@ final class SyncViewModel: ObservableObject {
         Task {
             await syncService?.checkSyncStatus()
         }
+    }
+
+    /// View conflict statistics
+    func viewConflictStats() {
+        if let stats = syncService?.getConflictStatistics() {
+            conflictStatsSummary = stats.summary
+            showConflictStats = true
+        }
+    }
+
+    /// Resolve conflict by choosing local or remote version
+    /// (Only used in manual resolution mode)
+    func resolveConflict(_ conflict: SyncConflict, chooseLocal: Bool) {
+        // Remove from active conflicts
+        activeConflicts.removeAll { $0.id == conflict.id }
+
+        // In manual mode, would apply chosen version here
+        // For Last-Writer-Wins, this isn't used
     }
 
     // MARK: - Private Methods
@@ -166,6 +219,10 @@ final class SyncViewModel: ObservableObject {
         // Bind pending changes count
         syncService.$pendingChangesCount
             .assign(to: &$pendingChangesCount)
+
+        // Bind active conflicts
+        syncService.$activeConflicts
+            .assign(to: &$activeConflicts)
     }
 
     /// Update last sync text with relative time

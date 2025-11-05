@@ -41,7 +41,7 @@ final class ContactPreviewViewModel {
     // MARK: - Private Properties
 
     private let rawText: String
-    private var modelContext: ModelContext?
+    private var databaseService: DatabaseService?
 
     // MARK: - Dependencies
 
@@ -54,9 +54,9 @@ final class ContactPreviewViewModel {
         parseScannedText(scannedText)
     }
 
-    /// Set model context for saving
-    func setModelContext(_ context: ModelContext) {
-        self.modelContext = context
+    /// Set database service for saving
+    func setDatabaseService(_ service: DatabaseService) {
+        self.databaseService = service
     }
 
     // MARK: - Parsing
@@ -147,7 +147,7 @@ final class ContactPreviewViewModel {
 
     /// Save business card to SwiftData
     func saveToDatabase() async throws {
-        guard let context = modelContext else {
+        guard let databaseService = databaseService else {
             throw SaveError.noContext
         }
 
@@ -171,10 +171,8 @@ final class ContactPreviewViewModel {
             savedToContacts: savedToContacts
         )
 
-        context.insert(card)
-
         do {
-            try context.save()
+            try await databaseService.save(card: card)
             hapticManager.saved()
             showSuccessAlert = true
         } catch {
@@ -282,7 +280,7 @@ enum SaveError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .noContext:
-            return "Database context not available"
+            return "Database service not available"
         case .invalidData:
             return "Please fix validation errors before saving"
         case .databaseError(let error):

@@ -40,7 +40,7 @@ final class CloudKitConfiguration: ObservableObject {
     static let containerIdentifier = "iCloud.com.deets.businesscards"
 
     /// Database type to use (private for user-specific data)
-    static let databaseScope: ModelConfiguration.CloudKitDatabase = .private
+    static let databaseScope: ModelConfiguration.CloudKitDatabase = .private(containerIdentifier)
 
     // MARK: - Private Properties
 
@@ -67,13 +67,26 @@ final class CloudKitConfiguration: ObservableObject {
     // MARK: - Configuration Methods
 
     /// Create ModelConfiguration based on sync preference
+    /// - Parameter schema: SwiftData schema to configure
+    /// - Returns: ModelConfiguration with encryption enabled
+    ///
+    /// Security: Enables iOS Data Protection with `.completeUnlessOpen` to encrypt
+    /// PII (names, emails, phone numbers, addresses) at rest. Data is accessible
+    /// while device is unlocked and remains accessible until device locks.
     func createModelConfiguration(schema: Schema) -> ModelConfiguration {
-        let cloudKitDatabase: ModelConfiguration.CloudKitDatabase = isSyncEnabled ? .private : .none
+        let cloudKitDatabase: ModelConfiguration.CloudKitDatabase = isSyncEnabled ? .private("iCloud.com.deets.businesscards") : .none
 
         return ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            cloudKitDatabase: cloudKitDatabase
+            allowsSave: true,
+            groupContainer: .none,
+            cloudKitDatabase: cloudKitDatabase,
+            // SECURITY: Enable file protection for PII encryption at rest
+            // `.completeUnlessOpen` ensures data is encrypted when device locks
+            // while allowing background access for recently opened files
+            // Compatible with CloudKit sync and foreground/background access
+            fileProtection: .completeUnlessOpen
         )
     }
 

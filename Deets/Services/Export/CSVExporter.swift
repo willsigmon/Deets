@@ -142,19 +142,46 @@ struct CSVExporter {
 
     // MARK: - CSV Escaping
 
-    /// Escape a value for CSV format
+    /// Sanitize value to prevent CSV formula injection attacks
+    /// - Prepends single quote to values starting with formula indicators: = + - @ \t \r
+    /// - Prevents code execution when CSV is opened in Excel, Google Sheets, LibreOffice
+    /// - Parameter value: Raw cell value (potentially from untrusted OCR input)
+    /// - Returns: Sanitized value safe for CSV export
+    private static func sanitizeFormulaInjection(_ value: String) -> String {
+        guard !value.isEmpty else { return value }
+
+        // Formula injection indicators per OWASP CSV Injection guidelines
+        let dangerousChars: Set<Character> = ["=", "+", "-", "@", "\t", "\r"]
+
+        // Check if first character is a formula indicator
+        if let firstChar = value.first, dangerousChars.contains(firstChar) {
+            // Prepend single quote to neutralize formula execution
+            // Excel/Sheets will treat this as text, not a formula
+            return "'\(value)"
+        }
+
+        return value
+    }
+
+    /// Escape a value for CSV format with formula injection protection
+    /// - Sanitizes formula injection attacks (= + - @ \t \r prefixes)
     /// - Wraps in quotes if contains comma, newline, or quote
     /// - Escapes quotes by doubling them
+    /// - Parameter value: Raw cell value to export
+    /// - Returns: Safe CSV cell value
     private static func escapeCSV(_ value: String) -> String {
-        // Check if escaping is needed
-        let needsEscaping = value.contains(",") || value.contains("\"") || value.contains("\n") || value.contains("\r")
+        // SECURITY: Sanitize formula injection FIRST before CSV escaping
+        let sanitized = sanitizeFormulaInjection(value)
+
+        // Check if CSV structural escaping is needed
+        let needsEscaping = sanitized.contains(",") || sanitized.contains("\"") || sanitized.contains("\n") || sanitized.contains("\r")
 
         if needsEscaping {
-            // Escape quotes by doubling them
-            let escaped = value.replacingOccurrences(of: "\"", with: "\"\"")
+            // Escape quotes by doubling them per CSV RFC 4180
+            let escaped = sanitized.replacingOccurrences(of: "\"", with: "\"\"")
             return "\"\(escaped)\""
         } else {
-            return value
+            return sanitized
         }
     }
 

@@ -385,18 +385,31 @@ private struct ValidationPatterns {
 // MARK: - Pattern Helper
 
 private struct Pattern {
-    let regex: NSRegularExpression
+    let regex: NSRegularExpression?
 
     init(regex pattern: String, options: NSRegularExpression.Options) {
-        self.regex = try! NSRegularExpression(pattern: pattern, options: options)
+        do {
+            self.regex = try NSRegularExpression(pattern: pattern, options: options)
+        } catch {
+            AppLogger.parser.error("Failed to compile regex pattern '\(pattern, privacy: .private)': \(error.localizedDescription)")
+            self.regex = nil
+        }
     }
 
     func matches(_ text: String) -> Bool {
+        guard let regex = regex else {
+            AppLogger.parser.warning("Regex pattern not available - defaulting to no match")
+            return false
+        }
         let range = NSRange(text.startIndex..., in: text)
         return regex.firstMatch(in: text, options: [], range: range) != nil
     }
 
     func firstMatch(in text: String) -> String? {
+        guard let regex = regex else {
+            AppLogger.parser.warning("Regex pattern not available - returning nil")
+            return nil
+        }
         let range = NSRange(text.startIndex..., in: text)
         guard let match = regex.firstMatch(in: text, options: [], range: range) else {
             return nil
@@ -429,17 +442,17 @@ extension TextValidator {
             ("123 Main Street", 0.87)
         ]
 
-        print("=== Text Validator Test Results ===")
+        AppLogger.parser.debug("=== Text Validator Test Results ===")
         for (text, confidence) in samples {
             let isValid = validator.validate(text: text, confidence: Float(confidence))
             let quality = validator.qualityScore(text: text, confidence: Float(confidence))
             let category = validator.categorizeText(text)
 
-            print("""
-                Text: "\(text)"
-                Valid: \(isValid)
-                Quality: \(String(format: "%.2f", quality))
-                Category: \(category?.displayName ?? "None")
+            AppLogger.parser.debug("""
+                Text: "\(text, privacy: .private)"
+                Valid: \(isValid, privacy: .public)
+                Quality: \(String(format: "%.2f", quality), privacy: .public)
+                Category: \(category?.displayName ?? "None", privacy: .public)
                 ---
                 """)
         }

@@ -29,7 +29,7 @@ struct ScanView: View {
 
                     // Icon
                     Image(systemName: "camera.viewfinder")
-                        .font(.system(size: 80))
+                        .iconXLarge()
                         .foregroundStyle(Color.teal)
                         .accessibilityHidden(true)
 

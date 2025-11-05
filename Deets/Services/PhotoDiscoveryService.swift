@@ -142,12 +142,20 @@ final class PhotoDiscoveryService: ObservableObject {
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
 
         // Filter to last 30 days
-        let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
-        fetchOptions.predicate = NSPredicate(
-            format: "creationDate > %@ AND mediaType == %d",
-            thirtyDaysAgo as NSDate,
-            PHAssetMediaType.image.rawValue
-        )
+        if let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: Date()) {
+            fetchOptions.predicate = NSPredicate(
+                format: "creationDate > %@ AND mediaType == %d",
+                thirtyDaysAgo as NSDate,
+                PHAssetMediaType.image.rawValue
+            )
+        } else {
+            // Fallback: just filter by media type without date restriction
+            AppLogger.photos.warning("Failed to calculate date 30 days ago - fetching all recent photos")
+            fetchOptions.predicate = NSPredicate(
+                format: "mediaType == %d",
+                PHAssetMediaType.image.rawValue
+            )
+        }
 
         let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
 

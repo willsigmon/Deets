@@ -19,16 +19,37 @@ enum Constants {
         static let buildNumber = "1"
 
         /// App Store URL (replace with actual when published)
-        static let appStoreURL = URL(string: "https://apps.apple.com/app/id...")!
+        static var appStoreURL: URL {
+            guard let url = URL(string: "https://apps.apple.com/app/id...") else {
+                AppLogger.error.error("Invalid App Store URL constant")
+                // Fallback to Apple's app store homepage
+                return URL(string: "https://apps.apple.com")!
+            }
+            return url
+        }
 
         /// Support email
         static let supportEmail = "support@deets.app"
 
         /// Privacy policy URL
-        static let privacyPolicyURL = URL(string: "https://deets.app/privacy")!
+        static var privacyPolicyURL: URL {
+            guard let url = URL(string: "https://deets.app/privacy") else {
+                AppLogger.error.error("Invalid privacy policy URL constant")
+                // Fallback to support email as mailto link
+                return URL(string: "mailto:\(supportEmail)")!
+            }
+            return url
+        }
 
         /// Terms of service URL
-        static let termsURL = URL(string: "https://deets.app/terms")!
+        static var termsURL: URL {
+            guard let url = URL(string: "https://deets.app/terms") else {
+                AppLogger.error.error("Invalid terms URL constant")
+                // Fallback to support email as mailto link
+                return URL(string: "mailto:\(supportEmail)")!
+            }
+            return url
+        }
     }
 
     // MARK: - Minimum Requirements

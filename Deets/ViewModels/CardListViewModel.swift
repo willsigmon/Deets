@@ -31,7 +31,14 @@ final class CardListViewModel {
 
     // MARK: - Dependencies
 
+    private let databaseService: DatabaseService
     private let hapticManager = HapticManager.shared
+
+    // MARK: - Initialization
+
+    init(databaseService: DatabaseService) {
+        self.databaseService = databaseService
+    }
 
     // MARK: - Sort Options
 
@@ -130,20 +137,32 @@ final class CardListViewModel {
     // MARK: - Actions
 
     /// Toggle favorite status
-    func toggleFavorite(_ card: BusinessCard) {
-        card.isFavorite.toggle()
-        card.dateModified = Date()
-        hapticManager.toggle()
+    func toggleFavorite(_ card: BusinessCard) async {
+        do {
+            try await databaseService.toggleFavorite(card)
+            hapticManager.toggle()
+        } catch {
+            AppLogger.database.error("Failed to toggle favorite: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// Delete card
-    func deleteCard(_ card: BusinessCard, from context: ModelContext) {
-        context.delete(card)
+    func deleteCard(_ card: BusinessCard) async {
         do {
-            try context.save()
+            try await databaseService.delete(card: card)
             hapticManager.deleted()
         } catch {
-            print("Failed to delete card: \(error)")
+            AppLogger.database.error("Failed to delete card: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Delete multiple cards
+    func deleteCards(_ cards: [BusinessCard]) async {
+        do {
+            try await databaseService.batchDelete(cards)
+            hapticManager.deleted()
+        } catch {
+            AppLogger.database.error("Failed to batch delete cards: \(error.localizedDescription, privacy: .public)")
         }
     }
 

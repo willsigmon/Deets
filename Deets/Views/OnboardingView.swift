@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var currentPage = 0
     @State private var showPermissions = false
 
@@ -92,7 +93,7 @@ struct OnboardingView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .indexViewStyle(.page(backgroundDisplayMode: .always))
-                .animation(.easeInOut, value: currentPage)
+                .animation(reduceMotion ? .none : .easeInOut, value: currentPage)
 
                 // Navigation buttons
                 VStack(spacing: 16) {
@@ -110,7 +111,7 @@ struct OnboardingView: View {
                         // Next button
                         Button {
                             HapticManager.shared.buttonTap()
-                            withAnimation {
+                            withAnimation(reduceMotion ? .none : .default) {
                                 currentPage += 1
                             }
                         } label: {
@@ -179,13 +180,13 @@ private struct WelcomePage: View {
                     .shadow(color: .black.opacity(0.1), radius: 20, y: 10)
 
                 Image(systemName: "person.text.rectangle.fill")
-                    .font(.system(size: 50))
+                    .iconMedium()
                     .foregroundStyle(.white)
             }
 
             VStack(spacing: 12) {
                 Text(L10n.Onboarding.welcomeTitle)
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.largeTitle.weight(.bold))
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.center)
 
@@ -223,7 +224,7 @@ private struct PageView: View {
                     .frame(width: 140, height: 140)
 
                 Image(systemName: page.systemImage)
-                    .font(.system(size: 60))
+                    .iconMediumLarge()
                     .foregroundStyle(page.color)
                     .accessibilityHidden(true)
             }
@@ -264,7 +265,7 @@ private struct PrivacyPage: View {
                         .frame(width: 140, height: 140)
 
                     Image(systemName: "lock.shield.fill")
-                        .font(.system(size: 60))
+                        .iconMediumLarge()
                         .foregroundStyle(.green)
                         .accessibilityHidden(true)
                 }
@@ -361,7 +362,7 @@ private struct PermissionsView: View {
 
                 // Icon
                 Image(systemName: "hand.raised.fill")
-                    .font(.system(size: 60))
+                    .iconMediumLarge()
                     .foregroundStyle(Color.teal)
                     .accessibilityHidden(true)
 

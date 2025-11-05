@@ -73,7 +73,7 @@ struct PhotoSelectionView: View {
     private var permissionPrompt: some View {
         VStack(spacing: 20) {
             Image(systemName: "photo.on.rectangle.angled")
-                .font(.system(size: 60))
+                .iconMediumLarge()
                 .foregroundColor(.blue)
 
             Text("Find Contact Photo")
@@ -134,7 +134,7 @@ struct PhotoSelectionView: View {
     private var permissionDenied: some View {
         VStack(spacing: 20) {
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 60))
+                .iconMediumLarge()
                 .foregroundColor(.orange)
 
             Text("Photo Access Disabled")
@@ -247,7 +247,7 @@ struct PhotoSelectionView: View {
     private var noCandidatesView: some View {
         VStack(spacing: 16) {
             Image(systemName: "photo.stack")
-                .font(.system(size: 50))
+                .iconMedium()
                 .foregroundColor(.gray)
 
             Text("No Photos Found")

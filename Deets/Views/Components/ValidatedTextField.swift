@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ValidatedTextField: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     let title: String
     let placeholder: String
     @Binding var text: String
@@ -78,7 +80,7 @@ struct ValidatedTextField: View {
                     .accessibilityLabel("Error: \(errorMessage)")
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: isValid)
+        .animation(reduceMotion ? .none : .easeInOut(duration: 0.2), value: isValid)
     }
 }
 

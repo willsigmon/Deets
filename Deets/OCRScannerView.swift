@@ -88,7 +88,7 @@ struct OCRScannerView: View {
     private var permissionView: some View {
         VStack(spacing: 20) {
             Image(systemName: "camera.fill")
-                .font(.system(size: 60))
+                .iconMediumLarge()
                 .foregroundStyle(.secondary)
 
             Text("Camera Access Required")
@@ -117,7 +117,7 @@ struct OCRScannerView: View {
     private var errorView: some View {
         VStack(spacing: 20) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 60))
+                .iconMediumLarge()
                 .foregroundStyle(.orange)
 
             Text("Scanner Unavailable")
@@ -199,7 +199,7 @@ struct OCRScannerView: View {
         generator.notificationOccurred(.success)
 
         // Could navigate to detail view or save here
-        print("Captured \(result.items.count) items")
+        AppLogger.ocr.info("Captured \(result.items.count, privacy: .public) recognized items")
     }
 }
 

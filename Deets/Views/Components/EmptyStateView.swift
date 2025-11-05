@@ -19,7 +19,7 @@ struct EmptyStateView: View {
             Spacer()
 
             Image(systemName: systemImage)
-                .font(.system(size: 64))
+                .iconLarge()
                 .foregroundStyle(.tertiary)
                 .accessibilityHidden(true)
 
@@ -74,7 +74,7 @@ struct EmptyStateView: View {
             message: "Scan your first business card to get started. It only takes a moment!",
             actionTitle: "Scan First Card"
         ) {
-            print("Start scanning")
+            AppLogger.ui.debug("Preview: Start scanning action triggered")
         }
         .tabItem {
             Label("With Action", systemImage: "1.circle")

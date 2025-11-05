@@ -119,14 +119,27 @@ Overlap area: Darker teal (blended)
 
 ### Primary Colors
 
-#### Teal (Brand Primary)
+#### Teal Accessible (UI Primary) - NEW DEFAULT
+- **Hex**: `#00796B` (light mode)
+- **RGB**: `0, 121, 107`
+- **HSB**: `173°, 100%, 47%`
+- **Contrast Ratio**: 5.32:1 on white (WCAG AA compliant)
+- **Usage**: Primary buttons, icons, interactive elements, all UI requiring contrast compliance
+- **SwiftUI**: `Color.teal` (now maps to TealAccessible asset)
+- **Dark Mode**: Automatically uses `#23C4AE` for optimal contrast on dark backgrounds
+
+**When to use**: ALL interactive elements, buttons, icons, text, tab bar tints, navigation highlights
+
+#### Teal Brand (Original - Limited Use)
 - **Hex**: `#23C4AE`
 - **RGB**: `35, 196, 174`
 - **HSB**: `173°, 82%, 77%`
-- **Usage**: Primary actions, logo, brand accents
-- **Accessibility**: AAA on white, AA on light gray
+- **Contrast Ratio**: 2.19:1 on white (FAILS WCAG AA - not accessible)
+- **Usage**: Logo only, decorative elements with no contrast requirements
+- **SwiftUI**: `Color.tealBrand` (use sparingly)
 
-**When to use**: Call-to-action buttons, navigation highlights, scan button, brand moments
+**When to use**: App icon/logo, marketing materials, non-interactive decorative elements ONLY
+**⚠️ WARNING**: This color VIOLATES Section 508 and WCAG AA when used on white backgrounds. Use `Color.teal` (accessible variant) for all UI elements.
 
 #### Coral (Accent)
 - **Hex**: `#FF766A`
@@ -192,16 +205,36 @@ Overlap area: Darker teal (blended)
 3. Graphite for content and structure
 4. Mist for backgrounds and breathing room
 
-**Contrast Ratios** (WCAG AAA):
-- Body text on background: Minimum 7:1
-- UI elements on background: Minimum 4.5:1
+**Contrast Ratios** (WCAG Compliance):
+
+WCAG Standards:
+- **WCAG AA**: 4.5:1 for normal text, 3:1 for large text (18pt+)
+- **WCAG AAA**: 7:1 for normal text, 4.5:1 for large text
+- **Section 508**: Must meet WCAG AA minimum
+
+Current Color Compliance:
+- **Teal Accessible (#00796B)**: 5.32:1 on white ✅ AA compliant
+- **Teal Brand (#23C4AE)**: 2.19:1 on white ❌ FAILS AA (non-compliant)
+- **Coral (#FF766A)**: 2.61:1 on white ❌ FAILS AA (use large text only, 18pt+)
+- **Success Green (#10B981)**: 2.54:1 on white ❌ FAILS AA for normal text
+- **Warning Amber (#F59E0B)**: 2.15:1 on white ❌ FAILS AA
+- **Error Red (#EF4444)**: 3.76:1 on white ⚠️ FAILS AA for normal text (use large text only)
+- **Graphite (#2B2E3A)**: 13.51:1 on white ✅ AAA compliant
+
+**Required Usage**:
+- Body text on background: Minimum 7:1 (AAA preferred) - Use Graphite (#2B2E3A)
+- UI interactive elements on background: Minimum 4.5:1 (AA required) - Use Teal Accessible (#00796B)
 - Icons and borders: Minimum 3:1
+- All primary CTAs: Use Teal Accessible (#00796B) - never Teal Brand
 
 **Dark Mode Adaptations**:
-- Teal: Lighten to `#2DD4BD` (+10% brightness)
+- **Teal Accessible**: Automatically uses `#23C4AE` (original brand teal) - excellent contrast on dark backgrounds
+- **Teal Brand**: Remains `#23C4AE` (same as accessible variant in dark mode)
 - Coral: Lighten to `#FF8B82` (+10% brightness)
 - Graphite: Use `#E5E7EB` for text on dark backgrounds
 - Mist: Becomes `#1F2937` (dark surface)
+
+**IMPORTANT**: Dark mode automatically provides good contrast for the original teal color. The accessible variant is only needed for light mode.
 
 ---
 

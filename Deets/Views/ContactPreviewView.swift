@@ -26,7 +26,7 @@ struct ContactPreviewView: View {
                     // Header
                     VStack(spacing: 8) {
                         Image(systemName: "person.crop.circle.badge.checkmark")
-                            .font(.system(size: 48))
+                            .iconRegular()
                             .foregroundStyle(Color.teal)
                             .accessibilityHidden(true)
 
@@ -199,7 +199,8 @@ struct ContactPreviewView: View {
             }
         }
         .onAppear {
-            viewModel.setModelContext(modelContext)
+            let databaseService = DatabaseService(modelContext: modelContext)
+            viewModel.setDatabaseService(databaseService)
         }
         .accessibilityElement(children: .contain)
     }
@@ -218,7 +219,7 @@ struct ContactPreviewView: View {
         https://acme.design
         """
     ) {
-        print("Dismissed")
+        AppLogger.ui.debug("Preview dismissed")
     }
     .modelContainer(for: BusinessCard.self, inMemory: true)
 }
@@ -227,7 +228,7 @@ struct ContactPreviewView: View {
     ContactPreviewView(
         scannedText: ""
     ) {
-        print("Dismissed")
+        AppLogger.ui.debug("Preview dismissed")
     }
     .modelContainer(for: BusinessCard.self, inMemory: true)
 }

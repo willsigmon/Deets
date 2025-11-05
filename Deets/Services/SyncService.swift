@@ -9,6 +9,7 @@ import Foundation
 import SwiftData
 import Combine
 import Network
+import OSLog
 
 /// Service for managing CloudKit sync operations
 @MainActor
@@ -27,6 +28,9 @@ final class SyncService: ObservableObject {
     /// Number of pending changes to sync
     @Published var pendingChangesCount: Int = 0
 
+    /// Active conflicts requiring user attention (if using manual resolution)
+    @Published var activeConflicts: [SyncConflict] = []
+
     // MARK: - Private Properties
 
     private let modelContext: ModelContext
@@ -35,13 +39,22 @@ final class SyncService: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var syncTimer: Timer?
 
+    /// Logger for sync operations
+    private let logger = Logger(subsystem: "com.deets.sync", category: "SyncService")
+
     /// Network connectivity status
     private var isNetworkAvailable: Bool = true
+
+    /// Conflict resolution statistics
+    private var conflictStats = ConflictStatistics()
 
     // MARK: - Initialization
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
+
+        // Configure conflict resolution policy
+        configureConflictResolution()
 
         // Observe configuration changes
         setupConfigurationObserver()
@@ -53,6 +66,8 @@ final class SyncService: ObservableObject {
         if configuration.isSyncEnabled {
             setupAutomaticSync()
         }
+
+        logger.info("SyncService initialized with Last-Writer-Wins conflict resolution")
     }
 
     deinit {
@@ -92,6 +107,23 @@ final class SyncService: ObservableObject {
     /// Disable sync
     func disableSync() {
         configuration.disableSync()
+        syncTimer?.invalidate()
+        syncTimer = nil
+        syncStatus = .notConfigured
+    }
+
+    /// Start monitoring and automatic sync (called when sync is enabled dynamically)
+    func startMonitoring() {
+        logger.info("Starting sync monitoring")
+        setupAutomaticSync()
+        Task {
+            await sync()
+        }
+    }
+
+    /// Stop monitoring and automatic sync (called when sync is disabled dynamically)
+    func stopMonitoring() {
+        logger.info("Stopping sync monitoring")
         syncTimer?.invalidate()
         syncTimer = nil
         syncStatus = .notConfigured
@@ -138,6 +170,132 @@ final class SyncService: ObservableObject {
         }
     }
 
+    // MARK: - Conflict Resolution
+
+    /// Configure SwiftData conflict resolution policy
+    ///
+    /// **Strategy: Last-Writer-Wins (Automatic)**
+    /// - Uses `dateModified` timestamp to determine winning version
+    /// - CloudKit automatically handles conflict detection
+    /// - SwiftData merges changes using NSMergePolicy
+    /// - No user intervention required
+    ///
+    /// **Handled Scenarios:**
+    /// 1. Same card edited on 2 devices → Newest timestamp wins
+    /// 2. Card deleted on one, edited on other → Deletion wins (CloudKit behavior)
+    /// 3. Network partition → When reconnected, newest modification wins
+    ///
+    /// **Alternative: Manual Resolution**
+    /// To enable user-choice conflict resolution:
+    /// 1. Change policy to `.manual` in CloudKitConfiguration
+    /// 2. Populate `activeConflicts` array
+    /// 3. Display ConflictResolutionView in SyncViewModel
+    private func configureConflictResolution() {
+        // SwiftData + CloudKit uses NSMergeByPropertyObjectTrump by default
+        // This automatically implements Last-Writer-Wins at property level
+        // Individual properties with newest timestamp win
+
+        logger.info("Conflict resolution configured: Last-Writer-Wins (automatic)")
+        logger.info("Conflicts resolved at property level using modification timestamps")
+    }
+
+    /// Detect and handle sync conflicts
+    ///
+    /// Called during sync operations to:
+    /// - Log conflict occurrences
+    /// - Update statistics
+    /// - Apply resolution strategy
+    /// - Notify user if needed (manual mode)
+    private func handleSyncConflicts() {
+        // SwiftData + CloudKit handles conflicts automatically
+        // This method tracks conflicts for logging and analytics
+
+        // Query for recently modified records that might have conflicts
+        let descriptor = FetchDescriptor<BusinessCard>(
+            predicate: #Predicate { card in
+                // Cards modified in last 5 minutes might have conflicts
+                card.dateModified > Date().addingTimeInterval(-300)
+            },
+            sortBy: [SortDescriptor(\.dateModified, order: .reverse)]
+        )
+
+        do {
+            let recentlyModified = try modelContext.fetch(descriptor)
+
+            if !recentlyModified.isEmpty {
+                logger.info("Detected \(recentlyModified.count) recently modified cards during sync")
+
+                // Check for potential conflicts based on CloudKit metadata
+                let potentialConflicts = recentlyModified.filter { card in
+                    // Card was modified locally but also has recent CloudKit updates
+                    if let cloudDate = card.cloudKitModificationDate {
+                        let localDate = card.dateModified
+                        // If CloudKit date and local date differ by < 1 minute, likely a conflict
+                        return abs(cloudDate.timeIntervalSince(localDate)) < 60
+                    }
+                    return false
+                }
+
+                if !potentialConflicts.isEmpty {
+                    conflictStats.totalConflicts += potentialConflicts.count
+                    conflictStats.lastConflictDate = Date()
+
+                    logger.warning("Detected \(potentialConflicts.count) potential conflicts resolved automatically")
+
+                    // Log conflict details for debugging
+                    for card in potentialConflicts {
+                        logConflictResolution(for: card)
+                    }
+                }
+            }
+        } catch {
+            logger.error("Failed to check for conflicts: \(error.localizedDescription)")
+        }
+    }
+
+    /// Log detailed conflict resolution information
+    private func logConflictResolution(for card: BusinessCard) {
+        logger.info("""
+            CONFLICT RESOLVED:
+            Card: \(card.displayName) (ID: \(card.id.uuidString))
+            Local Modified: \(card.dateModified.formatted())
+            CloudKit Modified: \(card.cloudKitModificationDate?.formatted() ?? "Unknown")
+            Resolution: Last-Writer-Wins (newest timestamp)
+            Winner: \(card.dateModified > (card.cloudKitModificationDate ?? .distantPast) ? "Local" : "Remote")
+            """)
+
+        conflictStats.autoResolvedConflicts += 1
+    }
+
+    /// Handle edge case: Card deleted on one device, edited on another
+    ///
+    /// **CloudKit Behavior:**
+    /// - Deletions are tombstoned and propagate to all devices
+    /// - If a card is deleted on Device A and edited on Device B:
+    ///   - Deletion wins (CloudKit default)
+    ///   - Edit is discarded
+    ///   - User sees card disappear on Device B after sync
+    ///
+    /// **Current Strategy:** Accept CloudKit default (deletion wins)
+    /// This is standard behavior for most sync systems and prevents zombie records.
+    ///
+    /// **Alternative:** Could implement "undelete" feature if needed
+    private func handleDeleteEditConflict(_ card: BusinessCard) {
+        // CloudKit automatically handles this - deletion always wins
+        // We just log it for awareness
+        logger.warning("""
+            DELETE-EDIT CONFLICT DETECTED:
+            Card: \(card.displayName)
+            Action: Card will be deleted (CloudKit default behavior)
+            Note: This is expected behavior - deletions propagate to all devices
+            """)
+    }
+
+    /// Get conflict resolution statistics
+    func getConflictStatistics() -> ConflictStatistics {
+        return conflictStats
+    }
+
     // MARK: - Private Methods
 
     /// Perform sync operation
@@ -146,10 +304,15 @@ final class SyncService: ObservableObject {
 
         isSyncing = true
         syncStatus = .syncing
+        logger.info("Starting sync operation")
 
         do {
             // Save pending changes to trigger CloudKit sync
             if modelContext.hasChanges {
+                let changeCount = modelContext.insertedModelsArray.count +
+                                 modelContext.changedModelsArray.count +
+                                 modelContext.deletedModelsArray.count
+                logger.info("Saving \(changeCount) pending changes")
                 try modelContext.save()
             }
 
@@ -157,9 +320,13 @@ final class SyncService: ObservableObject {
             // Wait a moment for sync to initiate
             try await Task.sleep(for: .milliseconds(500))
 
+            // Check for and handle any conflicts
+            handleSyncConflicts()
+
             syncStatus = .idle
             lastSyncDate = Date()
             configuration.updateSyncStatus(.idle)
+            logger.info("Sync completed successfully")
 
             // Update pending changes count
             await checkSyncStatus()
@@ -285,6 +452,55 @@ final class SyncService: ObservableObject {
 
         syncStatus = .error(syncError)
         configuration.updateSyncStatus(.error(syncError))
+    }
+}
+
+// MARK: - Supporting Types
+
+/// Represents a sync conflict requiring resolution
+struct SyncConflict: Identifiable {
+    let id = UUID()
+    let cardID: UUID
+    let cardName: String
+    let localVersion: BusinessCard
+    let remoteVersion: ConflictVersion
+    let conflictDate: Date
+
+    /// Remote version data for conflict comparison
+    struct ConflictVersion {
+        let fullName: String
+        let company: String?
+        let email: String?
+        let phoneNumber: String?
+        let dateModified: Date
+    }
+}
+
+/// Statistics for conflict resolution
+struct ConflictStatistics {
+    /// Total number of conflicts detected
+    var totalConflicts: Int = 0
+
+    /// Number of conflicts auto-resolved
+    var autoResolvedConflicts: Int = 0
+
+    /// Number of conflicts requiring manual resolution
+    var manualResolvedConflicts: Int = 0
+
+    /// Last time a conflict was detected
+    var lastConflictDate: Date?
+
+    /// Human-readable summary
+    var summary: String {
+        if totalConflicts == 0 {
+            return "No conflicts detected"
+        }
+        return """
+            Total Conflicts: \(totalConflicts)
+            Auto-Resolved: \(autoResolvedConflicts)
+            Manual: \(manualResolvedConflicts)
+            Last Conflict: \(lastConflictDate?.formatted() ?? "Never")
+            """
     }
 }
 

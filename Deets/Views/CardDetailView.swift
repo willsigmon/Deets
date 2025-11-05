@@ -33,7 +33,7 @@ struct CardDetailView: View {
                                 .frame(width: 100, height: 100)
 
                             Text(card.fullName.prefix(2).uppercased())
-                                .font(.system(size: 36, weight: .bold))
+                                .font(.largeTitle.weight(.bold))
                                 .foregroundStyle(Color.teal)
                         }
                         .accessibilityLabel("\(card.fullName) avatar")

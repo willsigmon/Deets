@@ -10,8 +10,9 @@ import SwiftData
 
 struct CardListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query private var cards: [BusinessCard]
-    @State private var viewModel = CardListViewModel()
+    @State private var viewModel: CardListViewModel?
     @State private var selectedCard: BusinessCard?
     @State private var showSortMenu = false
     @State private var showFilterMenu = false
@@ -25,7 +26,7 @@ struct CardListView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if filteredCards.isEmpty {
+                if let viewModel = viewModel, filteredCards.isEmpty {
                     if cards.isEmpty {
                         // No cards at all
                         EmptyStateView(
@@ -47,7 +48,7 @@ struct CardListView: View {
                             viewModel.clearFilters()
                         }
                     }
-                } else {
+                } else if let viewModel = viewModel {
                     // Card list
                     List {
                         ForEach(filteredCards) { card in
@@ -66,8 +67,9 @@ struct CardListView: View {
                                 }
 
                                 Button {
-                                    viewModel.toggleFavorite(card)
-                                    try? modelContext.save()
+                                    Task {
+                                        await viewModel.toggleFavorite(card)
+                                    }
                                 } label: {
                                     Label(
                                         card.isFavorite ? "Unfavorite" : "Favorite",
@@ -130,12 +132,20 @@ struct CardListView: View {
             .sheet(isPresented: $exportViewModel.showExportOptions) {
                 ExportOptionsView(viewModel: exportViewModel)
             }
+            .onAppear {
+                if viewModel == nil {
+                    let databaseService = DatabaseService(modelContext: modelContext)
+                    viewModel = CardListViewModel(databaseService: databaseService)
+                }
+            }
         }
     }
 
     // MARK: - Computed Properties
 
     private var filteredCards: [BusinessCard] {
+        guard let viewModel = viewModel else { return [] }
+
         var filtered = cards
 
         // Apply search filter
@@ -168,6 +178,8 @@ struct CardListView: View {
     }
 
     private func sortCards(_ cards: [BusinessCard]) -> [BusinessCard] {
+        guard let viewModel = viewModel else { return cards }
+
         switch viewModel.sortOption {
         case .dateScannedDescending:
             return cards.sorted { $0.dateScanned > $1.dateScanned }
@@ -230,8 +242,10 @@ struct CardListView: View {
     // MARK: - Actions
 
     private func deleteCard(_ card: BusinessCard) {
-        withAnimation {
-            viewModel.deleteCard(card, from: modelContext)
+        Task {
+            withAnimation(reduceMotion ? .none : .default) {
+                await viewModel?.deleteCard(card)
+            }
         }
     }
 
