@@ -89,12 +89,12 @@ struct ParsedContact {
 struct ParsedPhoneNumber: Identifiable {
     let id = UUID()
     let number: String
-    let label: CNLabeledValue<CNPhoneNumber>.Label
+    let label: String
     let formattedNumber: String?
     let confidence: Double
     let isValid: Bool
 
-    init(number: String, label: CNLabeledValue<CNPhoneNumber>.Label = CNLabelPhoneNumberMain, confidence: Double = 1.0) {
+    init(number: String, label: String = CNLabelPhoneNumberMain, confidence: Double = 1.0) {
         self.number = number
         self.label = label
         self.confidence = confidence
@@ -106,11 +106,11 @@ struct ParsedPhoneNumber: Identifiable {
 struct ParsedEmail: Identifiable {
     let id = UUID()
     let address: String
-    let label: CNLabeledValue<NSString>.Label
+    let label: String
     let confidence: Double
     let isValid: Bool
 
-    init(address: String, label: CNLabeledValue<NSString>.Label = CNLabelWork, confidence: Double = 1.0) {
+    init(address: String, label: String = CNLabelWork, confidence: Double = 1.0) {
         self.address = address.lowercased()
         self.label = label
         self.confidence = confidence
@@ -121,7 +121,7 @@ struct ParsedEmail: Identifiable {
 struct ParsedURL: Identifiable {
     let id = UUID()
     let url: String
-    let label: CNLabeledValue<NSString>.Label
+    let label: String
     let type: URLType
     let confidence: Double
     let isValid: Bool
@@ -135,7 +135,7 @@ struct ParsedURL: Identifiable {
         case other
     }
 
-    init(url: String, label: CNLabeledValue<NSString>.Label = CNLabelURLAddressHomePage, type: URLType = .website, confidence: Double = 1.0) {
+    init(url: String, label: String = CNLabelURLAddressHomePage, type: URLType = .website, confidence: Double = 1.0) {
         self.url = url
         self.label = label
         self.type = type
@@ -151,7 +151,7 @@ struct ParsedAddress: Identifiable {
     var state: String?
     var postalCode: String?
     var country: String?
-    var label: CNLabeledValue<CNPostalAddress>.Label
+    var label: String
     var confidence: Double
     var isValid: Bool
 
@@ -160,7 +160,7 @@ struct ParsedAddress: Identifiable {
          state: String? = nil,
          postalCode: String? = nil,
          country: String? = nil,
-         label: CNLabeledValue<CNPostalAddress>.Label = CNLabelWork,
+         label: String = CNLabelWork,
          confidence: Double = 1.0) {
         self.street = street
         self.city = city
@@ -348,19 +348,5 @@ private enum AddressValidator {
         let hasZip = !(postalCode?.isEmpty ?? true)
 
         return (hasStreet && hasCity) || (hasCity && hasState) || (hasStreet && hasZip)
-    }
-}
-
-// Placeholder for formatter (will be implemented in Formatters.swift)
-private enum PhoneNumberFormatter {
-    static func format(_ number: String) -> String? {
-        let digits = number.filter { $0.isNumber }
-        guard digits.count == 10 else { return nil }
-
-        let areaCode = digits.prefix(3)
-        let prefix = digits.dropFirst(3).prefix(3)
-        let lineNumber = digits.suffix(4)
-
-        return "(\(areaCode)) \(prefix)-\(lineNumber)"
     }
 }

@@ -112,7 +112,7 @@ See `Deets/Resources/InfoPlistRequirements.md` for complete setup instructions.
 ### App Configuration
 
 1. Set your development team in project settings
-2. Update bundle identifier if needed (default: `com.deets.app`)
+2. Update bundle identifier if needed (default: `com.sharedeets.app`)
 3. Build and run on a physical device (camera scanning not available in Simulator)
 
 ## Design Guidelines

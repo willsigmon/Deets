@@ -250,7 +250,7 @@ xcodebuild -importLocalizations -project Deets.xcodeproj -localizationPath ./Loc
 
 ```bash
 # Launch simulator in specific language
-xcrun simctl launch --console booted com.deets.app -AppleLanguages "(es)"
+xcrun simctl launch --console booted com.sharedeets.app -AppleLanguages "(es)"
 ```
 
 ### Check List

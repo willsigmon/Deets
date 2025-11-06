@@ -103,7 +103,7 @@ struct OnboardingView: View {
                             L10n.Onboarding.Button.getStarted,
                             systemImage: "arrow.right"
                         ) {
-                            HapticManager.shared.success()
+                            HapticManager.shared.buttonTap()
                             completeOnboarding()
                         }
                         .padding(.horizontal, 24)
@@ -405,7 +405,7 @@ private struct PermissionsView: View {
                     L10n.Onboarding.Button.done,
                     systemImage: "checkmark"
                 ) {
-                    HapticManager.shared.success()
+                    HapticManager.shared.buttonTap()
                     dismiss()
                     onComplete()
                 }

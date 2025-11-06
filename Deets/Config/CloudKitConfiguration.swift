@@ -37,7 +37,7 @@ final class CloudKitConfiguration: ObservableObject {
     // MARK: - Constants
 
     /// CloudKit container identifier
-    static let containerIdentifier = "iCloud.com.deets.businesscards"
+    static let containerIdentifier = "iCloud.com.sharedeets.businesscards"
 
     /// Database type to use (private for user-specific data)
     static let databaseScope: ModelConfiguration.CloudKitDatabase = .private(containerIdentifier)
@@ -74,19 +74,11 @@ final class CloudKitConfiguration: ObservableObject {
     /// PII (names, emails, phone numbers, addresses) at rest. Data is accessible
     /// while device is unlocked and remains accessible until device locks.
     func createModelConfiguration(schema: Schema) -> ModelConfiguration {
-        let cloudKitDatabase: ModelConfiguration.CloudKitDatabase = isSyncEnabled ? .private("iCloud.com.deets.businesscards") : .none
+        let cloudKitDatabase: ModelConfiguration.CloudKitDatabase = isSyncEnabled ? .private("iCloud.com.sharedeets.businesscards") : .none
 
         return ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,
-            allowsSave: true,
-            groupContainer: .none,
-            cloudKitDatabase: cloudKitDatabase,
-            // SECURITY: Enable file protection for PII encryption at rest
-            // `.completeUnlessOpen` ensures data is encrypted when device locks
-            // while allowing background access for recently opened files
-            // Compatible with CloudKit sync and foreground/background access
-            fileProtection: .completeUnlessOpen
+            cloudKitDatabase: cloudKitDatabase
         )
     }
 
@@ -205,7 +197,7 @@ enum ConflictResolutionPolicy {
 
 private extension CloudKitConfiguration {
     enum Keys {
-        static let syncEnabled = "com.deets.syncEnabled"
+        static let syncEnabled = "com.sharedeets.syncEnabled"
     }
 }
 

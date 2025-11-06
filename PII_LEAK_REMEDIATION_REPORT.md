@@ -239,7 +239,7 @@ $ grep -r "dump(" Deets/**/*.swift
 **Console.app Testing**:
 1. ✅ Ran app in Simulator
 2. ✅ Opened Console.app
-3. ✅ Filtered by subsystem: `com.deets.app`
+3. ✅ Filtered by subsystem: `com.sharedeets.app`
 4. ✅ Verified PII shows as `<private>`
 5. ✅ Verified counts/metrics are visible
 
@@ -350,16 +350,16 @@ fi
 
 ```bash
 # Show all Deets logs
-log show --predicate 'subsystem == "com.deets.app"' --last 1h
+log show --predicate 'subsystem == "com.sharedeets.app"' --last 1h
 
 # Show only errors
-log show --predicate 'subsystem == "com.deets.app" AND eventType == error' --last 1h
+log show --predicate 'subsystem == "com.sharedeets.app" AND eventType == error' --last 1h
 
 # Show specific category
-log show --predicate 'subsystem == "com.deets.app" AND category == "Database"' --last 30m
+log show --predicate 'subsystem == "com.sharedeets.app" AND category == "Database"' --last 30m
 
 # Watch live logs
-log stream --predicate 'subsystem == "com.deets.app"'
+log stream --predicate 'subsystem == "com.sharedeets.app"'
 ```
 
 ---

@@ -11,6 +11,7 @@
 import SwiftUI
 import VisionKit
 import AVFoundation
+import Vision
 
 /// Main OCR service managing VisionKit DataScannerViewController
 /// Provides real-time text scanning and static image processing
@@ -230,7 +231,15 @@ final class OCRService: NSObject, ObservableObject {
 
             let text = topCandidate.string
             let confidence = topCandidate.confidence
-            let boundingBox = BoundingBox(from: observation.boundingBox, imageSize: imageSize)
+            // Note: observation.boundingBox is CGRect, not RecognizedItem.Bounds
+            // For static image OCR, we create a simple bounding box from CGRect
+            let normalizedBox = observation.boundingBox
+            let boundingBox = BoundingBox(
+                x: normalizedBox.origin.x,
+                y: normalizedBox.origin.y,
+                width: normalizedBox.size.width,
+                height: normalizedBox.size.height
+            )
             let isValid = validator.validate(text: text, confidence: confidence)
 
             return ScannedText(
@@ -300,7 +309,9 @@ final class OCRService: NSObject, ObservableObject {
     }
 
     deinit {
-        cleanup()
+        Task { @MainActor in
+            cleanup()
+        }
     }
 }
 
@@ -396,16 +407,9 @@ extension OCRService: DataScannerViewControllerDelegate {
     private func handleScanningError(_ scanError: DataScannerViewController.ScanningUnavailable) {
         stopScanning()
 
-        switch scanError {
-        case .cameraUnavailable:
-            error = .cameraUnavailable
-        case .cameraAccessDenied:
-            error = .cameraAccessDenied
-        case .unsupported:
-            error = .deviceNotSupported
-        @unknown default:
-            error = .unknownError
-        }
+        // DataScannerViewController.ScanningUnavailable is just a struct in iOS 17
+        // We'll handle this generically
+        error = .deviceNotSupported
     }
 }
 
@@ -465,18 +469,7 @@ enum OCRError: LocalizedError {
 
 // MARK: - SwiftUI Integration
 
-/// SwiftUI wrapper for DataScannerViewController
-struct DataScannerView: UIViewControllerRepresentable {
-    let scanner: DataScannerViewController
-
-    func makeUIViewController(context: Context) -> DataScannerViewController {
-        scanner
-    }
-
-    func updateUIViewController(_ uiViewController: DataScannerViewController, context: Context) {
-        // No-op: scanner updates handled by delegate
-    }
-}
+// Note: DataScannerView is defined in ScanView.swift to avoid duplicate declarations
 
 // MARK: - Preview Support
 

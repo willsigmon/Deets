@@ -19,7 +19,7 @@ struct CardRowView: View {
                     .fill(Color.teal.opacity(0.15))
                     .frame(width: 48, height: 48)
 
-                Text(card.fullName.prefix(1).uppercased())
+                Text(String(card.displayName.prefix(1)).uppercased())
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(Color.teal)
             }
@@ -32,14 +32,14 @@ struct CardRowView: View {
                         .font(.body.weight(.semibold))
                         .foregroundStyle(.primary)
 
-                    if card.isFavorite {
+                    if card.isFavorite == true {
                         Image(systemName: "star.fill")
                             .font(.caption)
                             .foregroundStyle(.yellow)
                             .accessibilityLabel("Favorite")
                     }
 
-                    if card.savedToContacts {
+                    if card.savedToContacts == true {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.caption)
                             .foregroundStyle(.green)
@@ -89,10 +89,10 @@ struct CardRowView: View {
         if let subtitle = card.displaySubtitle {
             label += ", \(subtitle)"
         }
-        if card.isFavorite {
+        if card.isFavorite == true {
             label += ", Favorite"
         }
-        if card.savedToContacts {
+        if card.savedToContacts == true {
             label += ", Saved to contacts"
         }
         return label

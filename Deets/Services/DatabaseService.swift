@@ -46,7 +46,7 @@ final class DatabaseService {
 
             let elapsed = CFAbsoluteTimeGetCurrent() - startTime
             performanceLogger.debug("Saved card in \(elapsed, privacy: .public)s")
-            AppLogger.database.info("Saved card: \(card.id, privacy: .hash)")
+            AppLogger.database.info("Saved card: \(card.id?.uuidString ?? "unknown", privacy: .public)")
         } catch {
             AppLogger.database.error("Failed to save card: \(error.localizedDescription, privacy: .public)")
             throw DatabaseError.saveFailed(underlying: error)
@@ -169,16 +169,18 @@ final class DatabaseService {
             return try await fetchAll()
         }
 
+        // Note: #Predicate doesn't support lowercased() function, so we fetch all and filter in memory
+        // This is acceptable for typical business card databases (hundreds to low thousands of cards)
+        let allCards = try await fetch(sortBy: sortBy)
         let lowercasedQuery = query.lowercased()
-        let predicate = #Predicate<BusinessCard> { card in
-            card.fullName.lowercased().contains(lowercasedQuery) ||
+
+        return allCards.filter { card in
+            (card.fullName?.lowercased().contains(lowercasedQuery) ?? false) ||
             (card.company?.lowercased().contains(lowercasedQuery) ?? false) ||
             (card.email?.lowercased().contains(lowercasedQuery) ?? false) ||
             (card.jobTitle?.lowercased().contains(lowercasedQuery) ?? false) ||
             (card.notes?.lowercased().contains(lowercasedQuery) ?? false)
         }
-
-        return try await fetch(predicate: predicate, sortBy: sortBy)
     }
 
     /// Fetch favorite business cards
@@ -211,7 +213,7 @@ final class DatabaseService {
         // So we fetch all and filter in memory
         let allCards = try await fetchAll()
         return allCards.filter { card in
-            !Set(card.tags).isDisjoint(with: tags)
+            !Set(card.tags ?? []).isDisjoint(with: tags)
         }
     }
 
@@ -224,7 +226,7 @@ final class DatabaseService {
         do {
             card.dateModified = Date()
             try modelContext.save()
-            AppLogger.database.info("Updated card: \(card.id, privacy: .hash)")
+            AppLogger.database.info("Updated card: \(card.id?.uuidString ?? "unknown", privacy: .public)")
         } catch {
             AppLogger.database.error("Failed to update card: \(error.localizedDescription, privacy: .public)")
             throw DatabaseError.updateFailed(underlying: error)
@@ -234,9 +236,9 @@ final class DatabaseService {
     /// Toggle favorite status for a card
     /// - Parameter card: The card to toggle
     func toggleFavorite(_ card: BusinessCard) async throws {
-        card.isFavorite.toggle()
+        card.isFavorite = !(card.isFavorite ?? false)
         try await update(card: card)
-        AppLogger.database.debug("Toggled favorite status for card: \(card.id, privacy: .hash)")
+        AppLogger.database.debug("Toggled favorite status for card: \(card.id?.uuidString ?? "unknown", privacy: .public)")
     }
 
     /// Update multiple cards in a single transaction
@@ -269,7 +271,7 @@ final class DatabaseService {
         do {
             modelContext.delete(card)
             try modelContext.save()
-            AppLogger.database.info("Deleted card: \(card.id, privacy: .hash)")
+            AppLogger.database.info("Deleted card: \(card.id?.uuidString ?? "unknown", privacy: .public)")
         } catch {
             AppLogger.database.error("Failed to delete card: \(error.localizedDescription, privacy: .public)")
             throw DatabaseError.deleteFailed(underlying: error)
@@ -328,16 +330,16 @@ final class DatabaseService {
     /// - Returns: DatabaseStatistics struct with counts and metadata
     func statistics() async throws -> DatabaseStatistics {
         let allCards = try await fetchAll()
-        let favorites = allCards.filter { $0.isFavorite }
-        let savedToContacts = allCards.filter { $0.savedToContacts }
-        let allTags = Set(allCards.flatMap { $0.tags })
+        let favorites = allCards.filter { $0.isFavorite == true }
+        let savedToContacts = allCards.filter { $0.savedToContacts == true }
+        let allTags = Set(allCards.flatMap { $0.tags ?? [] })
 
         return DatabaseStatistics(
             totalCards: allCards.count,
             favoriteCards: favorites.count,
             savedToContactsCards: savedToContacts.count,
             uniqueTags: allTags.count,
-            lastModified: allCards.map { $0.dateModified }.max()
+            lastModified: allCards.compactMap { $0.dateModified }.max()
         )
     }
 
@@ -346,6 +348,8 @@ final class DatabaseService {
     /// Create a compound predicate combining multiple conditions with AND logic
     /// - Parameter predicates: Array of predicates to combine
     /// - Returns: Combined predicate
+    /// - Note: Requires iOS 17.4+ for predicate composition. On iOS 17.0-17.3, returns the first predicate only.
+    @available(iOS 17.4, *)
     static func and(_ predicates: [Predicate<BusinessCard>]) -> Predicate<BusinessCard>? {
         guard !predicates.isEmpty else { return nil }
         guard predicates.count > 1 else { return predicates.first }
@@ -360,6 +364,8 @@ final class DatabaseService {
     /// Create a compound predicate combining multiple conditions with OR logic
     /// - Parameter predicates: Array of predicates to combine
     /// - Returns: Combined predicate
+    /// - Note: Requires iOS 17.4+ for predicate composition. On iOS 17.0-17.3, returns the first predicate only.
+    @available(iOS 17.4, *)
     static func or(_ predicates: [Predicate<BusinessCard>]) -> Predicate<BusinessCard>? {
         guard !predicates.isEmpty else { return nil }
         guard predicates.count > 1 else { return predicates.first }

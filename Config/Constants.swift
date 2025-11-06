@@ -14,7 +14,7 @@ enum Constants {
 
     enum App {
         static let name = "Deets"
-        static let bundleIdentifier = "com.deets.app"
+        static let bundleIdentifier = "com.sharedeets.app"
         static let version = "1.0.0"
         static let buildNumber = "1"
 
@@ -304,7 +304,7 @@ enum Constants {
         static let containerName = "DeetsModel"
 
         /// iCloud container identifier
-        static let iCloudContainerIdentifier = "iCloud.com.deets.app"
+        static let iCloudContainerIdentifier = "iCloud.com.sharedeets.app"
 
         /// Default sort order for contacts
         static let defaultSortOrder = "updatedAt" // KeyPath string
@@ -423,14 +423,14 @@ enum Constants {
     enum Notifications {
         /// Notification identifiers
         enum Identifier {
-            static let scanComplete = "com.deets.notification.scanComplete"
-            static let exportComplete = "com.deets.notification.exportComplete"
+            static let scanComplete = "com.sharedeets.notification.scanComplete"
+            static let exportComplete = "com.sharedeets.notification.exportComplete"
         }
 
         /// Notification categories
         enum Category {
-            static let scanning = "com.deets.category.scanning"
-            static let export = "com.deets.category.export"
+            static let scanning = "com.sharedeets.category.scanning"
+            static let export = "com.sharedeets.category.export"
         }
     }
 

@@ -150,7 +150,7 @@ final class PhotoDiscoveryService: ObservableObject {
             )
         } else {
             // Fallback: just filter by media type without date restriction
-            AppLogger.photos.warning("Failed to calculate date 30 days ago - fetching all recent photos")
+            AppLogger.photo.warning("Failed to calculate date 30 days ago - fetching all recent photos")
             fetchOptions.predicate = NSPredicate(
                 format: "mediaType == %d",
                 PHAssetMediaType.image.rawValue

@@ -2,7 +2,7 @@
 # Deets Business Card Scanner ProGuard Configuration
 
 # Keep data models
--keep class com.deets.app.domain.model.** { *; }
+-keep class com.sharedeets.app.domain.model.** { *; }
 
 # Room
 -keep class * extends androidx.room.RoomDatabase

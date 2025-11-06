@@ -90,16 +90,16 @@ struct CSVExporter {
     private static func extractValue(from card: BusinessCard, field: ExportField) -> String {
         switch field {
         case .fullName:
-            return card.fullName
+            return card.fullName ?? card.displayName
 
         case .givenName:
             // Extract first name from fullName
-            let parts = card.fullName.components(separatedBy: " ")
+            let parts = (card.fullName ?? card.displayName).components(separatedBy: " ")
             return parts.first ?? ""
 
         case .familyName:
             // Extract last name from fullName
-            let parts = card.fullName.components(separatedBy: " ")
+            let parts = (card.fullName ?? card.displayName).components(separatedBy: " ")
             return parts.count > 1 ? parts.dropFirst().joined(separator: " ") : ""
 
         case .jobTitle:
@@ -130,13 +130,13 @@ struct CSVExporter {
             return formatDate(card.dateModified)
 
         case .tags:
-            return card.tags.joined(separator: "; ")
+            return (card.tags ?? []).joined(separator: "; ")
 
         case .isFavorite:
-            return card.isFavorite ? "Yes" : "No"
+            return (card.isFavorite ?? false) ? "Yes" : "No"
 
         case .savedToContacts:
-            return card.savedToContacts ? "Yes" : "No"
+            return (card.savedToContacts ?? false) ? "Yes" : "No"
         }
     }
 
@@ -187,7 +187,9 @@ struct CSVExporter {
 
     // MARK: - Utilities
 
-    private static func formatDate(_ date: Date) -> String {
+    private static func formatDate(_ date: Date?) -> String {
+        guard let date else { return "" }
+
         // ISO 8601 format for compatibility
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -199,7 +201,8 @@ struct CSVExporter {
 
     /// Generate filename for CSV export
     static func generateFilename(for card: BusinessCard) -> String {
-        let name = card.fullName.isEmpty ? "Contact" : sanitizeFilename(card.fullName)
+        let rawName = (card.fullName?.isEmpty == false ? card.fullName : nil) ?? card.displayName
+        let name = sanitizeFilename(rawName)
         return "\(name).csv"
     }
 

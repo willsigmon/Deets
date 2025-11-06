@@ -169,7 +169,7 @@ xcrun simctl ui booted increase_contrast 1
 # Test all combinations
 for mode in light dark; do
   xcrun simctl ui booted appearance $mode
-  xcrun simctl launch booted com.deets.app
+  xcrun simctl launch booted com.sharedeets.app
   sleep 5
   xcrun simctl io booted screenshot "contrast_test_${mode}.png"
 done

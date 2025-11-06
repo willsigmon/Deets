@@ -125,7 +125,7 @@ extension View {
 
 extension Text {
     /// Applies extra large title style (36pt base, bold, scales with .largeTitle)
-    func titleXLarge() -> Text {
+    func titleXLarge() -> some View {
         self.font(.system(size: 36, weight: .bold))
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }

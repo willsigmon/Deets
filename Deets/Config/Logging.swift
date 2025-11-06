@@ -71,7 +71,7 @@ enum AppLogger {
     // MARK: - Configuration
 
     /// App bundle identifier used as logging subsystem
-    private static let subsystem = Bundle.main.bundleIdentifier ?? "com.deets.app"
+    private static let subsystem = Bundle.main.bundleIdentifier ?? "com.sharedeets.app"
 }
 
 // MARK: - Privacy Guidelines

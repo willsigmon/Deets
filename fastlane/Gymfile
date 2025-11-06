@@ -50,7 +50,7 @@ result_bundle(true)
 export_options({
   method: "app-store",
   provisioningProfiles: {
-    "com.deets.app" => "match AppStore com.deets.app"
+    "com.sharedeets.app" => "match AppStore com.sharedeets.app"
   },
   signingStyle: "manual",
   uploadBitcode: false,

@@ -16,8 +16,8 @@
    - Click `+ Capability` button
    - Search for and add `iCloud`
    - Check ☑️ `CloudKit`
-   - Under `Containers`, you should see: `iCloud.com.deets.businesscards`
-   - If not, click `+` and add: `iCloud.com.deets.businesscards`
+   - Under `Containers`, you should see: `iCloud.com.sharedeets.businesscards`
+   - If not, click `+` and add: `iCloud.com.sharedeets.businesscards`
 
 3. **Verify Entitlements**
    - Check that `Deets.entitlements` appears in project navigator

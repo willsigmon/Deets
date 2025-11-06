@@ -96,12 +96,12 @@ app/src/
 ### 1. Unit Test (ViewModel)
 
 ```kotlin
-package com.deets.viewmodels
+package com.sharedeets.viewmodels
 
 import app.cash.turbine.test
-import com.deets.data.models.BusinessCard
-import com.deets.data.repository.CardRepository
-import com.deets.helpers.MockDataGenerator
+import com.sharedeets.data.models.BusinessCard
+import com.sharedeets.data.repository.CardRepository
+import com.sharedeets.helpers.MockDataGenerator
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -203,16 +203,16 @@ class ScanViewModelTest {
 ### 2. Room Database Test
 
 ```kotlin
-package com.deets.database
+package com.sharedeets.database
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.deets.data.database.CardDatabase
-import com.deets.data.database.dao.BusinessCardDao
-import com.deets.data.models.BusinessCard
-import com.deets.helpers.MockDataGenerator
+import com.sharedeets.data.database.CardDatabase
+import com.sharedeets.data.database.dao.BusinessCardDao
+import com.sharedeets.data.models.BusinessCard
+import com.sharedeets.helpers.MockDataGenerator
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -304,13 +304,13 @@ class RoomDatabaseTest {
 ### 3. Compose UI Test
 
 ```kotlin
-package com.deets.ui
+package com.sharedeets.ui
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.deets.ui.screens.ScanScreen
-import com.deets.viewmodels.ScanViewModel
+import com.sharedeets.ui.screens.ScanScreen
+import com.sharedeets.viewmodels.ScanViewModel
 import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
@@ -389,7 +389,7 @@ class ScanScreenTest {
 ### 4. Espresso UI Test (Views)
 
 ```kotlin
-package com.deets.ui
+package com.sharedeets.ui
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
@@ -398,8 +398,8 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.deets.R
-import com.deets.ui.MainActivity
+import com.sharedeets.R
+import com.sharedeets.ui.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -462,7 +462,7 @@ class ScanToSaveFlowTest {
 ### 5. Performance Test (Macrobenchmark)
 
 ```kotlin
-package com.deets.benchmark
+package com.sharedeets.benchmark
 
 import androidx.benchmark.macro.*
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
@@ -481,7 +481,7 @@ class ScanBenchmark {
 
     @Test
     fun scanStartup() = benchmarkRule.measureRepeated(
-        packageName = "com.deets",
+        packageName = "com.sharedeets",
         metrics = listOf(StartupTimingMetric()),
         iterations = 5,
         startupMode = StartupMode.COLD
@@ -492,7 +492,7 @@ class ScanBenchmark {
 
     @Test
     fun scrollCardList() = benchmarkRule.measureRepeated(
-        packageName = "com.deets",
+        packageName = "com.sharedeets",
         metrics = listOf(FrameTimingMetric()),
         iterations = 5,
         startupMode = StartupMode.WARM
@@ -508,7 +508,7 @@ class ScanBenchmark {
 
     @Test
     fun ocrProcessing() = benchmarkRule.measureRepeated(
-        packageName = "com.deets",
+        packageName = "com.sharedeets",
         metrics = listOf(
             FrameTimingMetric(),
             TraceSectionMetric("OCRProcessing")
@@ -533,10 +533,10 @@ class ScanBenchmark {
 ## Mock Data Generator (Android)
 
 ```kotlin
-package com.deets.helpers
+package com.sharedeets.helpers
 
-import com.deets.data.models.BusinessCard
-import com.deets.data.models.ParsedContact
+import com.sharedeets.data.models.BusinessCard
+import com.sharedeets.data.models.ParsedContact
 import java.util.Date
 import java.util.UUID
 

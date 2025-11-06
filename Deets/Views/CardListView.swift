@@ -26,7 +26,10 @@ struct CardListView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if let viewModel = viewModel, filteredCards.isEmpty {
+                if viewModel == nil {
+                    // Loading state while viewModel initializes
+                    ProgressView("Loading...")
+                } else if let viewModel = viewModel, filteredCards.isEmpty {
                     if cards.isEmpty {
                         // No cards at all
                         EmptyStateView(
@@ -72,8 +75,8 @@ struct CardListView: View {
                                     }
                                 } label: {
                                     Label(
-                                        card.isFavorite ? "Unfavorite" : "Favorite",
-                                        systemImage: card.isFavorite ? "star.slash" : "star.fill"
+                                        card.isFavorite == true ? "Unfavorite" : "Favorite",
+                                        systemImage: card.isFavorite == true ? "star.slash" : "star.fill"
                                     )
                                 }
                                 .tint(.yellow)
@@ -88,7 +91,10 @@ struct CardListView: View {
                     }
                     .listStyle(.plain)
                     .searchable(
-                        text: $viewModel.searchQuery,
+                        text: Binding(
+                            get: { viewModel.searchQuery },
+                            set: { viewModel.searchQuery = $0 }
+                        ),
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Search cards..."
                     )
@@ -158,18 +164,18 @@ struct CardListView: View {
 
         // Apply favorites filter
         if viewModel.showFavoritesOnly {
-            filtered = filtered.filter { $0.isFavorite }
+            filtered = filtered.filter { $0.isFavorite == true }
         }
 
         // Apply saved to contacts filter
         if viewModel.showSavedToContactsOnly {
-            filtered = filtered.filter { $0.savedToContacts }
+            filtered = filtered.filter { $0.savedToContacts == true }
         }
 
         // Apply tag filters
         if !viewModel.selectedTags.isEmpty {
             filtered = filtered.filter { card in
-                !Set(card.tags).isDisjoint(with: viewModel.selectedTags)
+                !Set(card.tags ?? []).isDisjoint(with: viewModel.selectedTags)
             }
         }
 
@@ -182,13 +188,13 @@ struct CardListView: View {
 
         switch viewModel.sortOption {
         case .dateScannedDescending:
-            return cards.sorted { $0.dateScanned > $1.dateScanned }
+            return cards.sorted { ($0.dateScanned ?? .distantPast) > ($1.dateScanned ?? .distantPast) }
         case .dateScannedAscending:
-            return cards.sorted { $0.dateScanned < $1.dateScanned }
+            return cards.sorted { ($0.dateScanned ?? .distantFuture) < ($1.dateScanned ?? .distantFuture) }
         case .nameAscending:
-            return cards.sorted { $0.fullName < $1.fullName }
+            return cards.sorted { ($0.fullName ?? "") < ($1.fullName ?? "") }
         case .nameDescending:
-            return cards.sorted { $0.fullName > $1.fullName }
+            return cards.sorted { ($0.fullName ?? "") > ($1.fullName ?? "") }
         case .companyAscending:
             return cards.sorted { ($0.company ?? "") < ($1.company ?? "") }
         case .companyDescending:
@@ -202,11 +208,11 @@ struct CardListView: View {
     private var sortMenuContent: some View {
         ForEach(CardListViewModel.SortOption.allCases) { option in
             Button {
-                viewModel.updateSortOption(option)
+                viewModel?.updateSortOption(option)
             } label: {
                 Label(
                     option.rawValue,
-                    systemImage: viewModel.sortOption == option ? "checkmark" : option.systemImage
+                    systemImage: viewModel?.sortOption == option ? "checkmark" : option.systemImage
                 )
             }
         }
@@ -214,27 +220,35 @@ struct CardListView: View {
 
     @ViewBuilder
     private var filterMenuContent: some View {
-        Section("Quick Filters") {
-            Toggle(isOn: $viewModel.showFavoritesOnly) {
-                Label("Favorites Only", systemImage: "star.fill")
-            }
-            .onChange(of: viewModel.showFavoritesOnly) {
-                HapticManager.shared.toggle()
-            }
+        if let viewModel = viewModel {
+            Section("Quick Filters") {
+                Toggle(isOn: Binding(
+                    get: { viewModel.showFavoritesOnly },
+                    set: { viewModel.showFavoritesOnly = $0 }
+                )) {
+                    Label("Favorites Only", systemImage: "star.fill")
+                }
+                .onChange(of: viewModel.showFavoritesOnly) {
+                    HapticManager.shared.toggle()
+                }
 
-            Toggle(isOn: $viewModel.showSavedToContactsOnly) {
-                Label("Saved to Contacts", systemImage: "person.crop.circle.badge.checkmark")
-            }
-            .onChange(of: viewModel.showSavedToContactsOnly) {
-                HapticManager.shared.toggle()
-            }
-        }
+                Toggle(isOn: Binding(
+                    get: { viewModel.showSavedToContactsOnly },
+                    set: { viewModel.showSavedToContactsOnly = $0 }
+                )) {
+                    Label("Saved to Contacts", systemImage: "person.crop.circle.badge.checkmark")
+                }
+                .onChange(of: viewModel.showSavedToContactsOnly) {
+                    HapticManager.shared.toggle()
+                }
 
-        if viewModel.hasActiveFilters {
-            Button(role: .destructive) {
-                viewModel.clearFilters()
-            } label: {
-                Label("Clear All Filters", systemImage: "xmark.circle")
+                if viewModel.hasActiveFilters {
+                    Button(role: .destructive) {
+                        viewModel.clearFilters()
+                    } label: {
+                        Label("Clear All Filters", systemImage: "xmark.circle")
+                    }
+                }
             }
         }
     }
@@ -243,36 +257,34 @@ struct CardListView: View {
 
     private func deleteCard(_ card: BusinessCard) {
         Task {
-            withAnimation(reduceMotion ? .none : .default) {
-                await viewModel?.deleteCard(card)
-            }
+            await viewModel?.deleteCard(card)
         }
     }
 
     private func formatCardText(_ card: BusinessCard) -> String {
-        var text = card.fullName
+        var lines: [String] = [card.displayName]
 
         if let jobTitle = card.jobTitle {
-            text += "\\n\(jobTitle)"
+            lines.append(jobTitle)
         }
 
         if let company = card.company {
-            text += "\\n\(company)"
+            lines.append(company)
         }
 
         if let email = card.email {
-            text += "\\n\(email)"
+            lines.append(email)
         }
 
         if let phone = card.phoneNumber {
-            text += "\\n\(phone)"
+            lines.append(phone)
         }
 
         if let website = card.website {
-            text += "\\n\(website)"
+            lines.append(website)
         }
 
-        return text
+        return lines.joined(separator: "\\n")
     }
 }
 

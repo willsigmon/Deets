@@ -424,7 +424,7 @@ final class SyncService {
     private let modelContainer: ModelContainer
 
     // SwiftData handles sync automatically when configured with:
-    // modelContainer.cloudKitContainer = "iCloud.com.deets.app"
+    // modelContainer.cloudKitContainer = "iCloud.com.sharedeets.app"
 
     func enableiCloudSync() async throws
     func disableiCloudSync() async throws

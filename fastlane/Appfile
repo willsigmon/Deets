@@ -14,13 +14,13 @@ itc_team_id(ENV["FASTLANE_ITC_TEAM_ID"] || "")
 team_id(ENV["FASTLANE_TEAM_ID"] || "")
 
 # App identifier
-app_identifier("com.deets.app")
+app_identifier("com.sharedeets.app")
 
 # For multiple app identifiers, use:
 # for_platform :ios do
-#   app_identifier("com.deets.app")
+#   app_identifier("com.sharedeets.app")
 # end
 #
 # for_lane :beta do
-#   app_identifier("com.deets.app.beta")
+#   app_identifier("com.sharedeets.app.beta")
 # end

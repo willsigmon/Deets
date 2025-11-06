@@ -790,7 +790,7 @@ func debouncedSave() {
 
 import os.signpost
 
-private let performanceLog = OSLog(subsystem: "com.deets", category: "Performance")
+private let performanceLog = OSLog(subsystem: "com.sharedeets", category: "Performance")
 
 func processImage(_ image: UIImage) async throws -> ScanResult {
     let signpostID = OSSignpostID(log: performanceLog)

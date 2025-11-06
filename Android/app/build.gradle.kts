@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.deets.app"
+    namespace = "com.sharedeets.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.deets.app"
+        applicationId = "com.sharedeets.app"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

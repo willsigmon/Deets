@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Vision
+import PhotosUI
 
 /// Interactive photo cropping view with face detection support
 struct PhotoCropperView: View {

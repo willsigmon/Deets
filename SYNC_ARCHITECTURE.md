@@ -225,7 +225,7 @@
 
 **Key Constants**:
 ```swift
-static let containerIdentifier = "iCloud.com.deets.businesscards"
+static let containerIdentifier = "iCloud.com.sharedeets.businesscards"
 static let databaseScope = .private
 ```
 

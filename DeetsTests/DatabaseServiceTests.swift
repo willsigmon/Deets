@@ -487,6 +487,7 @@ final class DatabaseServiceTests: XCTestCase {
 
     // MARK: - Query Builder Tests
 
+    @available(iOS 17.4, *)
     func testAndPredicate() async throws {
         // Given
         let cards = [
@@ -515,6 +516,7 @@ final class DatabaseServiceTests: XCTestCase {
         }
     }
 
+    @available(iOS 17.4, *)
     func testAndPredicateEmpty() {
         // When
         let result = DatabaseService.and([])
@@ -523,6 +525,7 @@ final class DatabaseServiceTests: XCTestCase {
         XCTAssertNil(result)
     }
 
+    @available(iOS 17.4, *)
     func testOrPredicate() async throws {
         // Given
         let cards = [
@@ -550,6 +553,7 @@ final class DatabaseServiceTests: XCTestCase {
         }
     }
 
+    @available(iOS 17.4, *)
     func testOrPredicateEmpty() {
         // When
         let result = DatabaseService.or([])

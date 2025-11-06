@@ -21,22 +21,56 @@ struct CardDetailView: View {
     @State private var exportError: String?
     @StateObject private var exportViewModel = ExportViewModel()
 
+    // Photo picker states
+    @State private var showPhotoOptions = false
+    @State private var showPhotoPicker = false
+    @State private var showPhotoSearch = false
+    @State private var selectedPhoto: UIImage?
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
                     // Header with avatar
                     VStack(spacing: 16) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.teal.opacity(0.15))
-                                .frame(width: 100, height: 100)
+                        ZStack(alignment: .bottomTrailing) {
+                            // Avatar image or initials
+                            Group {
+                                if let photo = selectedPhoto {
+                                    Image(uiImage: photo)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .clipShape(Circle())
+                                } else {
+                                    Circle()
+                                        .fill(Color.teal.opacity(0.15))
+                                        .frame(width: 100, height: 100)
+                                        .overlay {
+                                            Text(String(card.displayName.prefix(2)).uppercased())
+                                                .font(.largeTitle.weight(.bold))
+                                                .foregroundStyle(Color.teal)
+                                        }
+                                }
+                            }
 
-                            Text(card.fullName.prefix(2).uppercased())
-                                .font(.largeTitle.weight(.bold))
-                                .foregroundStyle(Color.teal)
+                            // Add photo button
+                            Button {
+                                HapticManager.shared.selectionChanged()
+                                showPhotoOptions = true
+                            } label: {
+                                Image(systemName: selectedPhoto == nil ? "camera.circle.fill" : "pencil.circle.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(.white)
+                                    .background {
+                                        Circle()
+                                            .fill(Color.teal)
+                                            .frame(width: 32, height: 32)
+                                    }
+                            }
+                            .offset(x: 4, y: 4)
                         }
-                        .accessibilityLabel("\(card.fullName) avatar")
+                        .accessibilityLabel("\(card.displayName) avatar")
 
                         VStack(spacing: 4) {
                             Text(card.displayName)
@@ -53,11 +87,11 @@ struct CardDetailView: View {
 
                         // Status badges
                         HStack(spacing: 12) {
-                            if card.isFavorite {
+                            if card.isFavorite == true {
                                 StatusBadge(systemImage: "star.fill", text: "Favorite", color: .yellow)
                             }
 
-                            if card.savedToContacts {
+                            if card.savedToContacts == true {
                                 StatusBadge(systemImage: "checkmark.circle.fill", text: "In Contacts", color: .green)
                             }
                         }
@@ -152,20 +186,20 @@ struct CardDetailView: View {
                         MetadataRow(
                             icon: "calendar",
                             title: "Scanned",
-                            value: card.dateScanned.formatted(date: .abbreviated, time: .shortened)
+                            value: card.dateScanned?.formatted(date: .abbreviated, time: .shortened) ?? "Unknown"
                         )
 
                         MetadataRow(
                             icon: "pencil",
                             title: "Last Modified",
-                            value: card.dateModified.formatted(date: .abbreviated, time: .shortened)
+                            value: card.dateModified?.formatted(date: .abbreviated, time: .shortened) ?? "Unknown"
                         )
                     }
                     .padding(.horizontal, 20)
 
                     // Action buttons
                     VStack(spacing: 12) {
-                        if !card.savedToContacts {
+                        if card.savedToContacts != true {
                             PrimaryButton("Save to Contacts", systemImage: "person.crop.circle.badge.plus") {
                                 Task {
                                     await saveToContacts()
@@ -191,8 +225,8 @@ struct CardDetailView: View {
                             }
 
                             SecondaryButton(
-                                card.isFavorite ? "Unfavorite" : "Favorite",
-                                systemImage: card.isFavorite ? "star.slash" : "star.fill"
+                                card.isFavorite ?? false ? "Unfavorite" : "Favorite",
+                                systemImage: (card.isFavorite ?? false) ? "star.slash" : "star.fill"
                             ) {
                                 toggleFavorite()
                             }
@@ -261,6 +295,28 @@ struct CardDetailView: View {
                     Text(error)
                 }
             }
+            .confirmationDialog("Add Photo", isPresented: $showPhotoOptions) {
+                Button("Choose from Photos") {
+                    showPhotoPicker = true
+                }
+
+                Button("Find in Photo Library") {
+                    showPhotoSearch = true
+                }
+
+                Button("Search LinkedIn", action: {})
+                    .disabled(true) // Placeholder for future
+
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Add a photo for \(card.displayName)")
+            }
+            .sheet(isPresented: $showPhotoPicker) {
+                PhotoPickerView(selectedImage: $selectedPhoto)
+            }
+            .sheet(isPresented: $showPhotoSearch) {
+                PhotoSearchView(contact: card.toParsedContact(), selectedImage: $selectedPhoto)
+            }
         }
         .accessibilityElement(children: .contain)
     }
@@ -268,7 +324,7 @@ struct CardDetailView: View {
     // MARK: - Actions
 
     private func toggleFavorite() {
-        card.isFavorite.toggle()
+        card.isFavorite = !(card.isFavorite ?? false)
         card.dateModified = Date()
         try? modelContext.save()
         HapticManager.shared.toggle()
@@ -307,7 +363,7 @@ struct CardDetailView: View {
 
             // Create contact
             let contact = CNMutableContact()
-            let nameParts = card.fullName.components(separatedBy: " ")
+            let nameParts = (card.fullName ?? "").components(separatedBy: " ")
             contact.givenName = nameParts.first ?? ""
             contact.familyName = nameParts.dropFirst().joined(separator: " ")
 
@@ -360,33 +416,37 @@ struct CardDetailView: View {
     }
 
     private func formatCardText() -> String {
-        var text = card.fullName
+        var lines: [String] = [card.displayName]
 
         if let jobTitle = card.jobTitle {
-            text += "\\n\(jobTitle)"
+            lines.append(jobTitle)
         }
 
         if let company = card.company {
-            text += "\\n\(company)"
+            lines.append(company)
         }
 
         if let email = card.email {
-            text += "\\n\(email)"
+            lines.append(email)
         }
 
         if let phone = card.phoneNumber {
-            text += "\\n\(phone)"
+            lines.append(phone)
         }
 
         if let website = card.website {
-            text += "\\n\(website)"
+            lines.append(website)
         }
 
         if let address = card.address {
-            text += "\\n\(address)"
+            lines.append(address)
         }
 
-        return text
+        if let notes = card.notes {
+            lines.append("\nNotes:\n\(notes)")
+        }
+
+        return lines.joined(separator: "\n")
     }
 }
 
@@ -507,6 +567,215 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+// MARK: - Business Card Extension
+
+extension BusinessCard {
+    func toParsedContact() -> ParsedContact {
+        let nameParts = (fullName ?? "").components(separatedBy: " ")
+        var contact = ParsedContact(rawText: fullName ?? "")
+
+        contact.givenName = nameParts.first
+        contact.familyName = nameParts.dropFirst().joined(separator: " ").isEmpty ? nil : nameParts.dropFirst().joined(separator: " ")
+        contact.organizationName = company
+        contact.jobTitle = jobTitle
+
+        if let email = email {
+            contact.emailAddresses = [ParsedEmail(address: email, label: "Work", confidence: 1.0)]
+        }
+
+        if let phone = phoneNumber {
+            contact.phoneNumbers = [ParsedPhoneNumber(number: phone, label: "Work", confidence: 1.0)]
+        }
+
+        if let website = website {
+            contact.urls = [ParsedURL(url: website, label: "Work", confidence: 1.0)]
+        }
+
+        // Address parsing skipped - would need structured parsing
+
+        return contact
+    }
+}
+
+// MARK: - Photo Picker Views
+
+import PhotosUI
+
+struct PhotoPickerView: UIViewControllerRepresentable {
+    @Binding var selectedImage: UIImage?
+    @Environment(\.dismiss) private var dismiss
+
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.filter = .images
+        config.selectionLimit = 1
+
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: PhotoPickerView
+
+        init(_ parent: PhotoPickerView) {
+            self.parent = parent
+        }
+
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            guard let provider = results.first?.itemProvider else {
+                parent.dismiss()
+                return
+            }
+
+            if provider.canLoadObject(ofClass: UIImage.self) {
+                provider.loadObject(ofClass: UIImage.self) { image, _ in
+                    DispatchQueue.main.async {
+                        self.parent.selectedImage = image as? UIImage
+                        self.parent.dismiss()
+                    }
+                }
+            } else {
+                parent.dismiss()
+            }
+        }
+    }
+}
+
+struct PhotoSearchView: View {
+    let contact: ParsedContact
+    @Binding var selectedImage: UIImage?
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var searchResults: [PhotoCandidate] = []
+    @State private var isSearching = false
+    @State private var errorMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if isSearching {
+                    VStack(spacing: 16) {
+                        ProgressView()
+                        Text("Searching for photos...")
+                            .foregroundColor(.secondary)
+                    }
+                } else if let error = errorMessage {
+                    VStack(spacing: 16) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.largeTitle)
+                            .foregroundColor(.orange)
+
+                        Text(error)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.secondary)
+
+                        Button("Try Again") {
+                            searchPhotos()
+                        }
+                    }
+                    .padding()
+                } else if searchResults.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .font(.largeTitle)
+                            .foregroundColor(.secondary)
+
+                        Text("No photos found")
+                            .font(.headline)
+
+                        Text("Try adding \(contact.displayName ?? "this person") to your People album in Photos app.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                } else {
+                    ScrollView {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible()),
+                            GridItem(.flexible()),
+                            GridItem(.flexible())
+                        ], spacing: 12) {
+                            ForEach(searchResults) { candidate in
+                                Button {
+                                    selectedImage = candidate.image
+                                    dismiss()
+                                } label: {
+                                    if let image = candidate.image {
+                                        Image(uiImage: image)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 100, height: 100)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    }
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+            .navigationTitle("Find Photo")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+            .onAppear {
+                searchPhotos()
+            }
+        }
+    }
+
+    private func searchPhotos() {
+        isSearching = true
+        errorMessage = nil
+
+        Task {
+            do {
+                let photoService = PhotoDiscoveryService.shared
+
+                // Request permission first
+                let status = await photoService.requestAuthorization()
+                guard status == .authorized || status == .limited else {
+                    await MainActor.run {
+                        errorMessage = "Photo library access is required"
+                        isSearching = false
+                    }
+                    return
+                }
+
+                // Search for photos
+                let results = try await photoService.findPhotos(for: contact, limit: 20)
+
+                await MainActor.run {
+                    searchResults = results
+                    isSearching = false
+
+                    if results.isEmpty {
+                        errorMessage = nil // Show empty state instead
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                    isSearching = false
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Preview

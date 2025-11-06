@@ -63,10 +63,10 @@ Container stored at:
 Check in Simulator:
 ```bash
 # Get simulator path
-xcrun simctl get_app_container booted com.deets.app data
+xcrun simctl get_app_container booted com.sharedeets.app data
 
 # Then check
-ls -la "$(xcrun simctl get_app_container booted com.deets.app data)/Library/Application Support/Deets/"
+ls -la "$(xcrun simctl get_app_container booted com.sharedeets.app data)/Library/Application Support/Deets/"
 ```
 
 Should see:
@@ -165,7 +165,7 @@ OR
 To start fresh:
 ```bash
 # Delete app from simulator
-xcrun simctl uninstall booted com.deets.app
+xcrun simctl uninstall booted com.sharedeets.app
 
 # Clean build
 cd "/Volumes/Ext-code/GitHub Repos/Deets"

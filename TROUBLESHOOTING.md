@@ -852,7 +852,7 @@ If usage is significantly higher, please report with:
 **Reset SwiftData (Development Only):**
 ```bash
 # Find app container
-xcrun simctl get_app_container booted com.deets.app
+xcrun simctl get_app_container booted com.sharedeets.app
 
 # Delete database
 rm -rf ~/Library/Developer/CoreSimulator/Devices/[DEVICE-ID]/data/Containers/Data/Application/[APP-ID]/Library/Application\ Support/default.store
@@ -883,7 +883,7 @@ rm -rf ~/Library/Developer/CoreSimulator/Devices/[DEVICE-ID]/data/Containers/Dat
   3. **Re-check** "Automatically manage signing"
   4. Xcode will regenerate profiles
 
-**"No profiles for 'com.deets.app' were found"**
+**"No profiles for 'com.sharedeets.app' were found"**
 - **Cause:** Bundle identifier already in use or not registered
 - **Fix:**
   1. Change bundle identifier to something unique

@@ -31,7 +31,7 @@ struct ValidatedTextField: View {
                 if let icon {
                     Image(systemName: icon)
                         .font(.body)
-                        .foregroundStyle(isValid ? .secondary : .red)
+                        .foregroundStyle(isValid ? Color.secondary : Color.red)
                         .frame(width: 20)
                         .accessibilityHidden(true)
                 }

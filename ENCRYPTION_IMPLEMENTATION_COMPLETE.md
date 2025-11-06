@@ -31,7 +31,7 @@
 ```swift
 func createModelConfiguration(schema: Schema) -> ModelConfiguration {
     let cloudKitDatabase: ModelConfiguration.CloudKitDatabase =
-        isSyncEnabled ? .private("iCloud.com.deets.businesscards") : .none
+        isSyncEnabled ? .private("iCloud.com.sharedeets.businesscards") : .none
 
     return ModelConfiguration(
         schema: schema,

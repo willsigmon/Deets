@@ -10,6 +10,7 @@ import SwiftData
 import Combine
 import Network
 import OSLog
+import UIKit
 
 /// Service for managing CloudKit sync operations
 @MainActor
@@ -40,7 +41,7 @@ final class SyncService: ObservableObject {
     private var syncTimer: Timer?
 
     /// Logger for sync operations
-    private let logger = Logger(subsystem: "com.deets.sync", category: "SyncService")
+    private let logger = Logger(subsystem: "com.sharedeets.sync", category: "SyncService")
 
     /// Network connectivity status
     private var isNetworkAvailable: Bool = true
@@ -156,15 +157,14 @@ final class SyncService: ObservableObject {
     func checkSyncStatus() async {
         guard configuration.isSyncEnabled else {
             syncStatus = .notConfigured
+            pendingChangesCount = 0
             return
         }
 
         // SwiftData with CloudKit automatically handles sync status
         // We just need to ensure context is saved
         if modelContext.hasChanges {
-            pendingChangesCount = modelContext.insertedModelsArray.count +
-                                  modelContext.changedModelsArray.count +
-                                  modelContext.deletedModelsArray.count
+            pendingChangesCount = estimatePendingChangeCount()
         } else {
             pendingChangesCount = 0
         }
@@ -211,12 +211,19 @@ final class SyncService: ObservableObject {
         // This method tracks conflicts for logging and analytics
 
         // Query for recently modified records that might have conflicts
+        // Note: Date calculations must be done outside #Predicate macro
+        let fiveMinutesAgo = Date().addingTimeInterval(-300)
         let descriptor = FetchDescriptor<BusinessCard>(
             predicate: #Predicate { card in
                 // Cards modified in last 5 minutes might have conflicts
-                card.dateModified > Date().addingTimeInterval(-300)
+                // Need to unwrap optional dateModified
+                if let modified = card.dateModified {
+                    modified > fiveMinutesAgo
+                } else {
+                    false
+                }
             },
-            sortBy: [SortDescriptor(\.dateModified, order: .reverse)]
+            sortBy: [SortDescriptor(\BusinessCard.dateModified, order: .reverse)]
         )
 
         do {
@@ -228,8 +235,8 @@ final class SyncService: ObservableObject {
                 // Check for potential conflicts based on CloudKit metadata
                 let potentialConflicts = recentlyModified.filter { card in
                     // Card was modified locally but also has recent CloudKit updates
-                    if let cloudDate = card.cloudKitModificationDate {
-                        let localDate = card.dateModified
+                    if let cloudDate = card.cloudKitModificationDate,
+                       let localDate = card.dateModified {
                         // If CloudKit date and local date differ by < 1 minute, likely a conflict
                         return abs(cloudDate.timeIntervalSince(localDate)) < 60
                     }
@@ -255,13 +262,28 @@ final class SyncService: ObservableObject {
 
     /// Log detailed conflict resolution information
     private func logConflictResolution(for card: BusinessCard) {
+        let cardID = card.id?.uuidString ?? "Unknown"
+        let localModified = card.dateModified?.formatted() ?? "Unknown"
+        let cloudModified = card.cloudKitModificationDate?.formatted() ?? "Unknown"
+
+        let winner: String
+        if let localDate = card.dateModified, let cloudDate = card.cloudKitModificationDate {
+            winner = localDate > cloudDate ? "Local" : "Remote"
+        } else if card.dateModified != nil {
+            winner = "Local"
+        } else if card.cloudKitModificationDate != nil {
+            winner = "Remote"
+        } else {
+            winner = "Unknown"
+        }
+
         logger.info("""
             CONFLICT RESOLVED:
-            Card: \(card.displayName) (ID: \(card.id.uuidString))
-            Local Modified: \(card.dateModified.formatted())
-            CloudKit Modified: \(card.cloudKitModificationDate?.formatted() ?? "Unknown")
+            Card: \(card.displayName) (ID: \(cardID))
+            Local Modified: \(localModified)
+            CloudKit Modified: \(cloudModified)
             Resolution: Last-Writer-Wins (newest timestamp)
-            Winner: \(card.dateModified > (card.cloudKitModificationDate ?? .distantPast) ? "Local" : "Remote")
+            Winner: \(winner)
             """)
 
         conflictStats.autoResolvedConflicts += 1
@@ -309,10 +331,9 @@ final class SyncService: ObservableObject {
         do {
             // Save pending changes to trigger CloudKit sync
             if modelContext.hasChanges {
-                let changeCount = modelContext.insertedModelsArray.count +
-                                 modelContext.changedModelsArray.count +
-                                 modelContext.deletedModelsArray.count
+                let changeCount = estimatePendingChangeCount()
                 logger.info("Saving \(changeCount) pending changes")
+                pendingChangesCount = changeCount
                 try modelContext.save()
             }
 
@@ -393,16 +414,17 @@ final class SyncService: ObservableObject {
     /// Monitor network connectivity
     private func startNetworkMonitoring() {
         networkMonitor.pathUpdateHandler = { [weak self] path in
-            let wasAvailable = self?.isNetworkAvailable ?? true
             let isAvailable = path.status == .satisfied
 
             Task { @MainActor [weak self] in
-                self?.isNetworkAvailable = isAvailable
+                guard let self = self else { return }
+                let wasAvailable = self.isNetworkAvailable
+                self.isNetworkAvailable = isAvailable
 
                 // If network just became available and we have pending changes, sync
                 if !wasAvailable && isAvailable {
-                    if self?.configuration.isSyncEnabled == true {
-                        await self?.sync()
+                    if self.configuration.isSyncEnabled == true {
+                        await self.sync()
                     }
                 }
             }
@@ -453,6 +475,15 @@ final class SyncService: ObservableObject {
         syncStatus = .error(syncError)
         configuration.updateSyncStatus(.error(syncError))
     }
+
+    /// Provide a safe estimate of pending changes until SwiftData exposes granular counts.
+    /// SwiftData currently keeps detailed change tracking internal, so we fall back to
+    /// reporting a sentinel value of `1` whenever unsaved changes exist. This avoids crashes
+    /// from the previous implementation while still signaling that work needs syncing.
+    private func estimatePendingChangeCount() -> Int {
+        guard modelContext.hasChanges else { return 0 }
+        return 1
+    }
 }
 
 // MARK: - Supporting Types
@@ -501,28 +532,5 @@ struct ConflictStatistics {
             Manual: \(manualResolvedConflicts)
             Last Conflict: \(lastConflictDate?.formatted() ?? "Never")
             """
-    }
-}
-
-// MARK: - Supporting Extensions
-
-extension ModelContext {
-    /// Get array of inserted models (helper for counting)
-    var insertedModelsArray: [any PersistentModel] {
-        Array(insertedModelsArray)
-    }
-
-    /// Get array of changed models
-    var changedModelsArray: [any PersistentModel] {
-        // SwiftData doesn't expose changed models directly
-        // This is a simplified version
-        []
-    }
-
-    /// Get array of deleted models
-    var deletedModelsArray: [any PersistentModel] {
-        // SwiftData doesn't expose deleted models directly
-        // This is a simplified version
-        []
     }
 }

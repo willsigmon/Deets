@@ -11,19 +11,20 @@ import SwiftData
 @Model
 final class BusinessCard {
     // MARK: - Properties
+    // NOTE: All properties are optional to support CloudKit sync
+    // SwiftData + CloudKit requires all attributes be optional or have defaults
 
     /// Unique identifier
-    @Attribute(.unique) var id: UUID
+    var id: UUID?
 
     /// Full name from card
-    var fullName: String
+    var fullName: String?
 
     /// Job title
     var jobTitle: String?
 
     /// Company/Organization name
-    /// Indexed for faster company-based queries and sorting
-    @Attribute(.indexed) var company: String?
+    var company: String?
 
     /// Email address
     var email: String?
@@ -41,23 +42,22 @@ final class BusinessCard {
     var notes: String?
 
     /// Original scanned text (for reference)
-    var rawText: String
+    var rawText: String?
 
     /// Date card was scanned
-    /// Indexed for faster date-based sorting and filtering
-    @Attribute(.indexed) var dateScanned: Date
+    var dateScanned: Date?
 
     /// Date last modified
-    var dateModified: Date
+    var dateModified: Date?
 
     /// Whether card has been saved to Contacts
-    var savedToContacts: Bool
+    var savedToContacts: Bool?
 
     /// Tags for categorization
-    var tags: [String]
+    var tags: [String]?
 
     /// Favorite status
-    var isFavorite: Bool
+    var isFavorite: Bool?
 
     // MARK: - CloudKit Sync Metadata
 
@@ -77,8 +77,8 @@ final class BusinessCard {
     // MARK: - Initialization
 
     init(
-        id: UUID = UUID(),
-        fullName: String,
+        id: UUID? = UUID(),
+        fullName: String? = nil,
         jobTitle: String? = nil,
         company: String? = nil,
         email: String? = nil,
@@ -86,12 +86,12 @@ final class BusinessCard {
         website: String? = nil,
         address: String? = nil,
         notes: String? = nil,
-        rawText: String,
-        dateScanned: Date = Date(),
-        dateModified: Date = Date(),
-        savedToContacts: Bool = false,
-        tags: [String] = [],
-        isFavorite: Bool = false,
+        rawText: String? = nil,
+        dateScanned: Date? = Date(),
+        dateModified: Date? = Date(),
+        savedToContacts: Bool? = false,
+        tags: [String]? = [],
+        isFavorite: Bool? = false,
         cloudKitModificationDate: Date? = nil,
         isLocalOnly: Bool = true
     ) {
@@ -118,7 +118,10 @@ final class BusinessCard {
 
     /// Display name for list views
     var displayName: String {
-        fullName.isEmpty ? "Unknown Contact" : fullName
+        guard let name = fullName, !name.isEmpty else {
+            return "Unknown Contact"
+        }
+        return name
     }
 
     /// Subtitle for list views (company or job title)

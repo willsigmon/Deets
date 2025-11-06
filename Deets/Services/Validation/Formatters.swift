@@ -62,7 +62,7 @@ enum PhoneNumberFormatter {
     }
 
     /// Detect phone number type from format/context
-    static func detectLabel(from text: String, number: String) -> CNLabeledValue<CNPhoneNumber>.Label {
+    static func detectLabel(from text: String, number: String) -> String {
         let lowercased = text.lowercased()
 
         // Check context around the number
@@ -274,7 +274,7 @@ enum AddressFormatter {
     }
 
     /// Detect address label from context
-    static func detectLabel(from text: String) -> CNLabeledValue<CNPostalAddress>.Label {
+    static func detectLabel(from text: String) -> String {
         let lowercased = text.lowercased()
 
         if lowercased.contains("work") || lowercased.contains("office") || lowercased.contains("business") {
@@ -296,7 +296,7 @@ enum EmailFormatter {
     }
 
     /// Detect email label from context
-    static func detectLabel(from text: String, email: String) -> CNLabeledValue<NSString>.Label {
+    static func detectLabel(from text: String, email: String) -> String {
         let lowercased = text.lowercased()
         let emailLower = email.lowercased()
 
@@ -353,7 +353,7 @@ enum URLFormatter {
     }
 
     /// Detect URL label from type
-    static func detectLabel(type: ParsedURL.URLType) -> CNLabeledValue<NSString>.Label {
+    static func detectLabel(type: ParsedURL.URLType) -> String {
         switch type {
         case .website:
             return CNLabelURLAddressHomePage

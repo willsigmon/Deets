@@ -61,16 +61,11 @@ struct DeetsApp: App {
         ])
 
         // Create configuration with STABLE storage location
-        // CloudKit sync will be managed dynamically via SyncService
+        // CloudKit sync enabled with private database
         let configuration = ModelConfiguration(
             schema: schema,
             url: stableStorageURL(),
-            allowsSave: true,
-            cloudKitDatabase: .none, // Sync managed dynamically, not at container level
-            // SECURITY: Enable file protection for PII encryption at rest
-            // `.completeUnlessOpen` ensures data is encrypted when device locks
-            // while allowing background access for recently opened files
-            fileProtection: .completeUnlessOpen
+            cloudKitDatabase: .private(CloudKitConfiguration.containerIdentifier)
         )
 
         do {
@@ -186,6 +181,13 @@ struct ContentView: View {
                     Label("Scan", systemImage: "camera.fill")
                 }
                 .tag(1)
+
+            // Settings Tab
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
+                .tag(2)
         }
         .tint(Color.teal)
         .onAppear {
@@ -309,5 +311,5 @@ struct DatabaseErrorView: View {
 }
 
 #Preview("Database Error") {
-    DatabaseErrorView(error: NSError(domain: "com.deets.app", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to create database store"]))
+    DatabaseErrorView(error: NSError(domain: "com.sharedeets.app", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to create database store"]))
 }

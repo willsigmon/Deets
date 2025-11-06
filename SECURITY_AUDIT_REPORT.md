@@ -206,7 +206,7 @@ private func handleTappedItem(_ item: RecognizedItem) {
 ```swift
 import os.log
 
-private let logger = Logger(subsystem: "com.deets.app", category: "OCR")
+private let logger = Logger(subsystem: "com.sharedeets.app", category: "OCR")
 
 private func handleTappedItem(_ item: RecognizedItem) {
     logger.debug("User tapped on item: \(item.id, privacy: .public)")
@@ -410,7 +410,7 @@ For non-sensitive preferences, UserDefaults is acceptable. However, document tha
 **Line:** 40
 
 ```swift
-static let containerIdentifier = "iCloud.com.deets.businesscards"
+static let containerIdentifier = "iCloud.com.sharedeets.businesscards"
 ```
 
 **Recommendation:**
@@ -579,7 +579,7 @@ private static func sanitizeFilename(_ name: String) -> String {
 
 ### Configuration Review
 
-**Container:** `iCloud.com.deets.businesscards`
+**Container:** `iCloud.com.sharedeets.businesscards`
 **Database Scope:** Private (user-specific)
 **Encryption:** End-to-end (managed by Apple)
 

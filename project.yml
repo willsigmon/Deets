@@ -4,7 +4,7 @@
 name: Deets
 
 options:
-  bundleIdPrefix: com.deets
+  bundleIdPrefix: com.sharedeets
   deploymentTarget:
     iOS: 16.0
   developmentLanguage: en
@@ -24,41 +24,65 @@ targets:
     platform: iOS
 
     sources:
-      - Deets
+      - path: Deets
+        excludes:
+          - "**/*.md"
+          - "**/Info.plist"
+          - "**/PrivacyInfo.xcprivacy"
+
+    resources:
+      - path: Deets/Resources
+        excludes:
+          - "**/*.md"
+      - Deets/PrivacyInfo.xcprivacy
 
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.deets.app
-        INFOPLIST_FILE: Deets/Resources/Info.plist
+        PRODUCT_NAME: Deets
+        PRODUCT_BUNDLE_IDENTIFIER: com.sharedeets.app
+        INFOPLIST_FILE: Deets/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: Deets/Deets.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
-        TARGETED_DEVICE_FAMILY: 1 # iPhone only
-        SWIFT_EMIT_LOC_STRINGS: true
-        ENABLE_PREVIEWS: true
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_EMIT_LOC_STRINGS: YES
+        ENABLE_PREVIEWS: YES
         SWIFT_STRICT_CONCURRENCY: complete
-
-    info:
-      path: Deets/Resources/Info.plist
-      properties:
-        CFBundleDisplayName: Deets
-        CFBundleShortVersionString: "1.0.0"
-        CFBundleVersion: "1"
-        UILaunchScreen: {}
-        UISupportedInterfaceOrientations:
-          - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationPortraitUpsideDown
-        UIRequiredDeviceCapabilities:
-          - camera-flash
-          - still-camera
-        NSCameraUsageDescription: "Deets needs camera access to scan business cards and extract contact information"
-        NSContactsUsageDescription: "Deets saves scanned business cards to your contacts for easy access"
+        IPHONEOS_DEPLOYMENT_TARGET: 17.0
 
     dependencies: []
 
     scheme:
-      testTargets: []
-      gatherCoverageData: false
+      testTargets:
+        - DeetsTests
+        - DeetsUITests
+      gatherCoverageData: true
 
-    preBuildScripts: []
+  DeetsTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: DeetsTests
+        excludes:
+          - "**/*.md"
+    dependencies:
+      - target: Deets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sharedeets.app.tests
+        IPHONEOS_DEPLOYMENT_TARGET: 17.0
 
-    postBuildScripts: []
+  DeetsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: DeetsUITests
+        excludes:
+          - "**/*.md"
+    dependencies:
+      - target: Deets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sharedeets.app.uitests
+        IPHONEOS_DEPLOYMENT_TARGET: 17.0

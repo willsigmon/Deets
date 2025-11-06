@@ -159,11 +159,11 @@ final class TextValidator {
         score *= contentFactor
 
         // Pattern recognition bonus (if matches known patterns)
-        let patternBonus = hasKnownPattern(trimmed) ? 1.1 : 1.0
+        let patternBonus: Float = hasKnownPattern(trimmed) ? 1.1 : 1.0
         score *= patternBonus
 
         // Clamp to 0.0 - 1.0
-        return max(0.0, min(1.0, score))
+        return max(0.0 as Float, min(1.0 as Float, score))
     }
 
     // MARK: - Categorization

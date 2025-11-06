@@ -133,7 +133,7 @@ platform :ios do
   lane :sync_dev_certs do
     match(
       type: "development",
-      app_identifier: "com.deets.app",
+      app_identifier: "com.sharedeets.app",
       readonly: is_ci,
       git_url: ENV['MATCH_GIT_URL']
     )
@@ -144,7 +144,7 @@ platform :ios do
   lane :sync_appstore_certs do
     match(
       type: "appstore",
-      app_identifier: "com.deets.app",
+      app_identifier: "com.sharedeets.app",
       readonly: is_ci,
       git_url: ENV['MATCH_GIT_URL']
     )
@@ -156,7 +156,7 @@ platform :ios do
     register_devices(devices_file: "./fastlane/devices.txt")
     match(
       type: "development",
-      app_identifier: "com.deets.app",
+      app_identifier: "com.sharedeets.app",
       force_for_new_devices: true,
       git_url: ENV['MATCH_GIT_URL']
     )

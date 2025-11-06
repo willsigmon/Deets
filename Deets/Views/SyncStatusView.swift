@@ -105,13 +105,15 @@ struct SyncStatusView: View {
                     }
 
                     // MARK: - Troubleshooting Section
-                    Section("Troubleshooting") {
+                    Section {
                         Button {
                             viewModel.forceFullSync()
                         } label: {
                             Label("Force Full Sync", systemImage: "arrow.triangle.2.circlepath.circle")
                         }
                         .disabled(!viewModel.canSync)
+                    } header: {
+                        Text("Troubleshooting")
                     } footer: {
                         Text("Use 'Force Full Sync' if you're experiencing sync issues.")
                     }

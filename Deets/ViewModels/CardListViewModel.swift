@@ -86,48 +86,9 @@ final class CardListViewModel {
         }
     }
 
-    /// Predicate for filtering cards
-    var filterPredicate: Predicate<BusinessCard>? {
-        var predicates: [Predicate<BusinessCard>] = []
-
-        // Search query filter
-        if !searchQuery.isEmpty {
-            let query = searchQuery.lowercased()
-            predicates.append(#Predicate<BusinessCard> { card in
-                card.fullName.lowercased().contains(query) ||
-                (card.company?.lowercased().contains(query) ?? false) ||
-                (card.email?.lowercased().contains(query) ?? false) ||
-                (card.jobTitle?.lowercased().contains(query) ?? false)
-            })
-        }
-
-        // Favorites filter
-        if showFavoritesOnly {
-            predicates.append(#Predicate<BusinessCard> { card in
-                card.isFavorite == true
-            })
-        }
-
-        // Saved to contacts filter
-        if showSavedToContactsOnly {
-            predicates.append(#Predicate<BusinessCard> { card in
-                card.savedToContacts == true
-            })
-        }
-
-        // Combine predicates
-        if predicates.isEmpty {
-            return nil
-        } else if predicates.count == 1 {
-            return predicates[0]
-        } else {
-            return predicates.reduce(predicates[0]) { result, predicate in
-                #Predicate<BusinessCard> { card in
-                    result.evaluate(card) && predicate.evaluate(card)
-                }
-            }
-        }
-    }
+    // Note: Filtering is done in CardListView.filteredCards computed property
+    // using Swift's filter() method to avoid #Predicate limitations with lowercased()
+    // and evaluate() which require iOS 17.4+
 
     /// Whether any filters are active
     var hasActiveFilters: Bool {
@@ -200,7 +161,7 @@ final class CardListViewModel {
 
     /// Get all unique tags from cards
     func extractTags(from cards: [BusinessCard]) -> [String] {
-        let allTags = cards.flatMap { $0.tags }
+        let allTags = cards.flatMap { $0.tags ?? [] }
         return Array(Set(allTags)).sorted()
     }
 }

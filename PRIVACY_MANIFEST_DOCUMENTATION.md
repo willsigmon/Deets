@@ -115,7 +115,7 @@ Deets **DOES NOT** track users for the following purposes:
 // ... (see FeatureFlags.swift lines 133-155)
 
 // CloudKitConfiguration.swift
-"com.deets.syncEnabled"
+"com.sharedeets.syncEnabled"
 ```
 
 **Compliance notes**:

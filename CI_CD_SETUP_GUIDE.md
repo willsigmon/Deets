@@ -101,7 +101,7 @@ open Deets.xcodeproj
 ### 2. Configure Apple Developer Portal
 
 1. Log in to [Apple Developer Portal](https://developer.apple.com)
-2. Create App ID: `com.deets.app`
+2. Create App ID: `com.sharedeets.app`
 3. Enable capabilities:
    - iCloud (CloudKit)
    - Push Notifications (future)
@@ -114,7 +114,7 @@ open Deets.xcodeproj
 1. Log in to [App Store Connect](https://appstoreconnect.apple.com)
 2. Create new app:
    - Name: **Deets**
-   - Bundle ID: `com.deets.app`
+   - Bundle ID: `com.sharedeets.app`
    - SKU: `deets-ios-v1`
    - Platform: iOS
 3. Create API Key:
@@ -237,7 +237,7 @@ Edit `fastlane/Appfile`:
 apple_id("your-apple-id@example.com")
 itc_team_id("123456789")  # Optional: if multiple teams
 team_id("ABCDE12345")
-app_identifier("com.deets.app")
+app_identifier("com.sharedeets.app")
 ```
 
 ### 2. Available Lanes
@@ -306,9 +306,9 @@ certificates/
 │       └── ABCDE12345.cer
 └── profiles/
     ├── development/
-    │   └── AppStore_com.deets.app.mobileprovision
+    │   └── AppStore_com.sharedeets.app.mobileprovision
     └── appstore/
-        └── AppStore_com.deets.app.mobileprovision
+        └── AppStore_com.sharedeets.app.mobileprovision
 ```
 
 ### Adding New Team Members

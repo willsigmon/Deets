@@ -77,11 +77,17 @@ struct BoundingBox: Equatable, Codable {
     }
 
     /// Create from VisionKit's RecognizedItem bounds
-    init(from bounds: CGRect, imageSize: CGSize) {
-        self.x = bounds.minX / imageSize.width
-        self.y = bounds.minY / imageSize.height
-        self.width = bounds.width / imageSize.width
-        self.height = bounds.height / imageSize.height
+    init(from bounds: RecognizedItem.Bounds, in imageSize: CGSize) {
+        // RecognizedItem.Bounds provides corner points, we need to calculate the bounding rect
+        let minX = min(bounds.topLeft.x, bounds.bottomLeft.x)
+        let maxX = max(bounds.topRight.x, bounds.bottomRight.x)
+        let minY = min(bounds.topLeft.y, bounds.topRight.y)
+        let maxY = max(bounds.bottomLeft.y, bounds.bottomRight.y)
+
+        self.x = minX / imageSize.width
+        self.y = minY / imageSize.height
+        self.width = (maxX - minX) / imageSize.width
+        self.height = (maxY - minY) / imageSize.height
     }
 
     init(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {
@@ -172,8 +178,9 @@ extension ScannedText {
         }
 
         let text = observation.transcript
-        let confidence = observation.confidence
-        let boundingBox = BoundingBox(from: observation.bounds, imageSize: imageSize)
+        // VisionKit's RecognizedItem.Text doesn't provide confidence, default to 1.0
+        let confidence: Float = 1.0
+        let boundingBox = BoundingBox(from: observation.bounds, in: imageSize)
 
         // Run validation if validator provided
         let isValid = validator?.validate(text: text, confidence: confidence) ?? true

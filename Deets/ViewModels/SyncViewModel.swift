@@ -53,7 +53,7 @@ final class SyncViewModel: ObservableObject {
     // MARK: - Private Properties
 
     private let configuration = CloudKitConfiguration.shared
-    private var syncService: SyncService?
+    internal var syncService: SyncService?  // Made internal for DeetsApp access
     private var cancellables = Set<AnyCancellable>()
     private let dateFormatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()

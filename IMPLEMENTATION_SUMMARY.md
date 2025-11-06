@@ -19,7 +19,7 @@
 - Reactive status updates using Combine
 
 **Key Features**:
-- Container ID: `iCloud.com.deets.businesscards`
+- Container ID: `iCloud.com.sharedeets.businesscards`
 - Private database (user-specific data)
 - Automatic schema migration
 - Safe fallback when iCloud unavailable
@@ -169,7 +169,7 @@
 5. Add "iCloud"
 6. Enable:
    - CloudKit
-   - Containers: `iCloud.com.deets.businesscards`
+   - Containers: `iCloud.com.sharedeets.businesscards`
 
 ### 2. Apple Developer Portal
 1. Sign in to [developer.apple.com](https://developer.apple.com)
@@ -180,8 +180,8 @@
 
 ### 3. Bundle Identifier
 Ensure your bundle identifier matches the CloudKit container:
-- Current: `com.deets.businesscards`
-- Container: `iCloud.com.deets.businesscards`
+- Current: `com.sharedeets.businesscards`
+- Container: `iCloud.com.sharedeets.businesscards`
 - If different, update `CloudKitConfiguration.containerIdentifier`
 
 ---

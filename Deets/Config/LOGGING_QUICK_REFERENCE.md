@@ -195,23 +195,23 @@ AppLogger.ui.debug("Frame: \(view.frame)")
 
 ### Console.app (macOS)
 1. Open Console.app
-2. Filter by subsystem: `com.deets.app`
+2. Filter by subsystem: `com.sharedeets.app`
 3. Filter by category: Select category from sidebar
 4. Verify privacy: PII should show as `<private>`
 
 ### Command Line
 ```bash
 # Show all logs from Deets
-log show --predicate 'subsystem == "com.deets.app"' --last 1h
+log show --predicate 'subsystem == "com.sharedeets.app"' --last 1h
 
 # Show only errors
-log show --predicate 'subsystem == "com.deets.app" AND eventType == error' --last 1h
+log show --predicate 'subsystem == "com.sharedeets.app" AND eventType == error' --last 1h
 
 # Show specific category
-log show --predicate 'subsystem == "com.deets.app" AND category == "OCR"' --last 5m
+log show --predicate 'subsystem == "com.sharedeets.app" AND category == "OCR"' --last 5m
 
 # Show with private data (only on your device)
-log show --predicate 'subsystem == "com.deets.app"' --info --debug --last 1h
+log show --predicate 'subsystem == "com.sharedeets.app"' --info --debug --last 1h
 ```
 
 ---

@@ -35,7 +35,7 @@ open Deets.xcodeproj
 2. Select the **Deets** target
 3. Go to **Signing & Capabilities**
 4. Select your **Team**
-5. Update **Bundle Identifier** if needed (default: `com.deets.app`)
+5. Update **Bundle Identifier** if needed (default: `com.sharedeets.app`)
 
 ### 2. Build Configuration
 

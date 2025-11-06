@@ -96,19 +96,12 @@ final class ModelContainerManager: ObservableObject {
 
         // Create configuration with current sync setting
         let cloudKitDatabase: ModelConfiguration.CloudKitDatabase = syncEnabled
-            ? .private("iCloud.com.deets.businesscards")
+            ? .private("iCloud.com.sharedeets.businesscards")
             : .none
 
         let modelConfiguration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,
-            allowsSave: true,
-            groupContainer: .none,
-            cloudKitDatabase: cloudKitDatabase,
-            // SECURITY: Enable file protection for PII encryption at rest
-            // `.completeUnlessOpen` ensures data is encrypted when device locks
-            // while allowing background access for recently opened files
-            fileProtection: .completeUnlessOpen
+            cloudKitDatabase: cloudKitDatabase
         )
 
         do {

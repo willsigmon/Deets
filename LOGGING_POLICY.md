@@ -252,7 +252,7 @@ When adding new code:
 
 1. **Run app in Simulator or Device**
 2. **Open Console.app** (macOS)
-3. **Filter by subsystem**: `com.deets.app` (or your bundle identifier)
+3. **Filter by subsystem**: `com.sharedeets.app` (or your bundle identifier)
 4. **Verify PII shows as `<private>`** in logs
 
 ### Example Console Output
@@ -277,13 +277,13 @@ Saved contact: John Smith at john.smith@email.com
 
 ```bash
 # Filter by subsystem
-log show --predicate 'subsystem == "com.deets.app"' --last 1h
+log show --predicate 'subsystem == "com.sharedeets.app"' --last 1h
 
 # Filter by category
-log show --predicate 'subsystem == "com.deets.app" AND category == "OCR"' --last 1h
+log show --predicate 'subsystem == "com.sharedeets.app" AND category == "OCR"' --last 1h
 
 # Show private data (only works on your own device)
-log show --predicate 'subsystem == "com.deets.app"' --info --debug --last 1h
+log show --predicate 'subsystem == "com.sharedeets.app"' --info --debug --last 1h
 ```
 
 ### Unit Tests

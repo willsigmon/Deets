@@ -19,8 +19,9 @@ struct VCardExporter {
         var vcard = beginVCard()
 
         // Name (required field)
-        vcard += formatName(fullName: card.fullName)
-        vcard += formatFormattedName(card.fullName)
+        let fullName = (card.fullName?.isEmpty == false ? card.fullName : nil) ?? card.displayName
+        vcard += formatName(fullName: fullName)
+        vcard += formatFormattedName(fullName)
 
         // Organization
         if let company = card.company {
@@ -234,7 +235,11 @@ struct VCardExporter {
         }
     }
 
-    private static func formatRevision(_ date: Date) -> String {
+    private static func formatRevision(_ date: Date?) -> String {
+        guard let date else {
+            return ISO8601DateFormatter().string(from: Date())
+        }
+
         // ISO 8601 format: 20231105T143022Z
         let formatter = ISO8601DateFormatter()
         return formatter.string(from: date)
@@ -299,7 +304,8 @@ struct VCardExporter {
 
     /// Generate filename for vCard export
     static func generateFilename(for card: BusinessCard) -> String {
-        let name = card.fullName.isEmpty ? "Contact" : sanitizeFilename(card.fullName)
+        let rawName = (card.fullName?.isEmpty == false ? card.fullName : nil) ?? card.displayName
+        let name = sanitizeFilename(rawName)
         return "\(name).vcf"
     }
 

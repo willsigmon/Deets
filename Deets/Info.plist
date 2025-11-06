@@ -2,31 +2,60 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- MARK: Camera & OCR Permissions -->
-
-	<!-- Camera Usage - Required for VisionKit DataScannerViewController -->
+	<key>CFBundleDisplayName</key>
+	<string>Deets</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>MinimumOSVersion</key>
+	<string>16.0</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<false/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Deets needs camera access to scan business cards and extract contact information using text recognition.</string>
-
-	<!-- Photo Library Usage - Optional, for saved images -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Deets can scan business cards from your photo library to extract contact information.</string>
-
-	<!-- Photo Library Add Usage - For saving scanned cards -->
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Deets can save scanned business card images to your photo library for future reference.</string>
-
-	<!-- MARK: App Configuration -->
-
-	<!-- Supported Interface Orientations (iPhone) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Deets can scan business cards from your photo library to extract contact information.</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIImageName</key>
+		<string>LaunchImage</string>
+	</dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+		<string>camera</string>
+	</array>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-
-	<!-- Supported Interface Orientations (iPad) -->
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -34,72 +63,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-
-	<!-- MARK: VisionKit Requirements -->
-
-	<!-- Minimum iOS Version -->
-	<key>MinimumOSVersion</key>
-	<string>16.0</string>
-
-	<!-- Required Device Capabilities -->
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-		<string>camera</string>
-	</array>
-
-	<!-- Background Modes (if needed for processing) -->
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>processing</string>
-	</array>
-
-	<!-- MARK: Privacy & Security -->
-
-	<!-- App Transport Security -->
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<!-- Allow loading images from HTTP sources if needed -->
-		<key>NSAllowsArbitraryLoadsInWebContent</key>
-		<false/>
-	</dict>
-
-	<!-- MARK: App Appearance -->
-
-	<!-- Launch Screen Configuration -->
-	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIImageName</key>
-		<string>LaunchImage</string>
-	</dict>
-
-	<!-- Status Bar Style -->
-	<key>UIStatusBarStyle</key>
-	<string>UIStatusBarStyleDefault</string>
-
-	<!-- View Controller-based Status Bar Appearance -->
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-
-	<!-- MARK: Scene Configuration (SwiftUI) -->
-
-	<!-- Application Scene Manifest -->
-	<key>UIApplicationSceneManifest</key>
-	<dict>
-		<key>UIApplicationSupportsMultipleScenes</key>
-		<true/>
-		<key>UISceneConfigurations</key>
-		<dict>
-			<key>UIWindowSceneSessionRoleApplication</key>
-			<array>
-				<dict>
-					<key>UISceneConfigurationName</key>
-					<string>Default Configuration</string>
-					<key>UISceneDelegateClassName</key>
-					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-				</dict>
-			</array>
-		</dict>
-	</dict>
 </dict>
 </plist>

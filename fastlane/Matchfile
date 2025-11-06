@@ -12,7 +12,7 @@ git_branch("main")
 storage_mode("git")
 
 # App identifier
-app_identifier(["com.deets.app"])
+app_identifier(["com.sharedeets.app"])
 
 # Your Apple Developer Portal username
 username(ENV["FASTLANE_APPLE_ID"] || "")

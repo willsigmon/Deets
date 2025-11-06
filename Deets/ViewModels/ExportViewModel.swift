@@ -71,14 +71,24 @@ class ExportViewModel: ObservableObject {
     func configureSingleCard(_ card: BusinessCard) {
         currentCard = card
         exportScope = .single
-        selectedCards = [card.id]
+        allCards = [card]
+
+        if let id = card.id {
+            selectedCards = [id]
+        } else {
+            selectedCards.removeAll()
+        }
     }
 
     /// Configure for multiple cards export
     func configureMultipleCards(_ cards: [BusinessCard], preselected: Set<UUID> = []) {
         allCards = cards
         exportScope = preselected.isEmpty ? .all : .selected
-        selectedCards = preselected.isEmpty ? Set(cards.map(\.id)) : preselected
+        if preselected.isEmpty {
+            selectedCards = Set(cards.compactMap(\.id))
+        } else {
+            selectedCards = preselected
+        }
     }
 
     // MARK: - Export Actions
@@ -179,7 +189,7 @@ class ExportViewModel: ObservableObject {
 
     /// Select all cards
     func selectAllCards() {
-        selectedCards = Set(allCards.map(\.id))
+        selectedCards = Set(allCards.compactMap(\.id))
     }
 
     /// Deselect all cards
@@ -195,11 +205,22 @@ class ExportViewModel: ObservableObject {
     // MARK: - Computed Properties
 
     var selectedCardCount: Int {
-        selectedCards.count
+        switch exportScope {
+        case .single:
+            return currentCard == nil ? 0 : 1
+        case .selected:
+            return allCards.filter { card in
+                guard let id = card.id else { return false }
+                return selectedCards.contains(id)
+            }.count
+        case .all:
+            return allCards.count
+        }
     }
 
     var canExport: Bool {
-        !selectedCards.isEmpty && (selectedFormat != .csv || !selectedFields.isEmpty)
+        let cards = getCardsToExport()
+        return !cards.isEmpty && (selectedFormat != .csv || !selectedFields.isEmpty)
     }
 
     var exportButtonTitle: String {
@@ -221,7 +242,10 @@ class ExportViewModel: ObservableObject {
             return currentCard.map { [$0] } ?? []
 
         case .selected:
-            return allCards.filter { selectedCards.contains($0.id) }
+            return allCards.filter { card in
+                guard let id = card.id else { return false }
+                return selectedCards.contains(id)
+            }
 
         case .all:
             return allCards

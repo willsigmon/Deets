@@ -22,7 +22,7 @@ This checklist covers everything needed to launch Deets on the iOS App Store, fr
 - [ ] **All features functional**: Scanning, saving, exporting, search
 - [ ] **No crashes or major bugs** in primary workflows
 - [ ] **Xcode project clean**: No compiler warnings
-- [ ] **Bundle ID configured**: `com.deets.app` (or your chosen ID)
+- [ ] **Bundle ID configured**: `com.sharedeets.app` (or your chosen ID)
 - [ ] **Version number set**: 1.0.0 (Marketing Version)
 - [ ] **Build number set**: 1 (increments with each build)
 - [ ] **Deployment target**: iOS 17.0 (minimum)
